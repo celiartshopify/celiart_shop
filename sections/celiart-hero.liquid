@@ -1,0 +1,227 @@
+{{ 'celiart-home.css' | asset_url | stylesheet_tag }}
+{{ 'celiart-hero-v2.css' | asset_url | stylesheet_tag }}
+
+<section
+  id="CeliartHero-{{ section.id }}"
+  class="ca-hero-v2"
+  style="
+    --ca-hero-v2-bg: {{ section.settings.background_color }};
+    --ca-hero-v2-accent: {{ section.settings.accent_color }};
+    --ca-hero-v2-ink: {{ section.settings.text_color }};
+    --ca-hero-v2-image-position: {{ section.settings.image_position }};
+    --ca-hero-v2-mobile-position: {{ section.settings.mobile_image_position }};
+  "
+>
+  <div class="ca-hero-v2__media" aria-hidden="true">
+    {% assign hero_image = section.settings.image %}
+    {% assign mobile_image = section.settings.mobile_image | default: hero_image %}
+
+    {% if hero_image != blank %}
+      <picture>
+        {% if mobile_image != blank %}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {{ mobile_image | image_url: width: 750 }} 750w,
+              {{ mobile_image | image_url: width: 1100 }} 1100w,
+              {{ mobile_image | image_url: width: 1500 }} 1500w
+            "
+            sizes="100vw"
+          >
+        {% endif %}
+
+        {{ hero_image
+          | image_url: width: 2600
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '900, 1200, 1500, 1800, 2200, 2600',
+            sizes: '(max-width: 749px) 100vw, 58vw',
+            alt: section.settings.image_alt,
+            class: 'ca-hero-v2__image'
+        }}
+      </picture>
+    {% else %}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'ca-hero-v2__placeholder' }}
+    {% endif %}
+  </div>
+
+  <div class="ca-hero-v2__inner">
+    <div class="ca-hero-v2__copy">
+      {% if section.settings.script_line != blank %}
+        <p class="ca-hero-v2__eyebrow">{{ section.settings.script_line | escape }}</p>
+      {% endif %}
+
+      <h1 class="ca-hero-v2__title">
+        {% if section.settings.title != blank %}
+          <span class="ca-hero-v2__title-main">{{ section.settings.title | escape }}</span>
+        {% endif %}
+
+        {% if section.settings.accent != blank %}
+          <span class="ca-hero-v2__title-accent">
+            {{ section.settings.accent | escape }}<span class="ca-hero-v2__title-heart" aria-hidden="true">♥</span>
+          </span>
+        {% endif %}
+      </h1>
+
+      {% if section.settings.text != blank %}
+        <div class="ca-hero-v2__text rte">{{ section.settings.text }}</div>
+      {% endif %}
+
+      {% if section.settings.button_label != blank %}
+        <div class="ca-hero-v2__actions">
+          {% if section.settings.button_label != blank %}
+            <a
+              class="ca-hero-v2__button ca-hero-v2__button--primary"
+              href="{{ section.settings.button_link | default: routes.all_products_collection_url }}"
+            >
+              <span>{{ section.settings.button_label | escape }}</span>
+              <span class="ca-hero-v2__button-mark" aria-hidden="true">✦</span>
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      
+    </div>
+  </div>
+
+  <div class="ca-hero-v2__wave" aria-hidden="true"></div>
+</section>
+
+{% schema %}
+{
+  "name": "CeliArt — Hero",
+  "settings": [
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Couleur du fond",
+      "default": "#f7efe8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte",
+      "default": "#30251f"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur rose",
+      "default": "#df9d9c"
+    },
+    {
+      "type": "text",
+      "id": "script_line",
+      "label": "Ligne manuscrite",
+      "default": "Vos idées,"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre principal",
+      "default": "brodées avec"
+    },
+    {
+      "type": "text",
+      "id": "accent",
+      "label": "Mot rose",
+      "default": "Amour"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Description",
+      "default": "<p>Des créations uniques et personnelles pour chaque moment de votre vie.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Bouton Collections",
+      "default": "Découvrir nos Collections"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Lien Collections"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button_label",
+      "label": "Bouton BestSellers",
+      "default": "Découvrir nos BestSellers"
+    },
+    {
+      "type": "url",
+      "id": "secondary_button_link",
+      "label": "Lien BestSellers"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image ordinateur"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Image mobile (optionnelle)"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Texte alternatif de l’image",
+      "default": "Créations personnalisées CeliArt"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Position de l’image ordinateur",
+      "default": "center center",
+      "options": [
+        { "value": "left center", "label": "Gauche" },
+        { "value": "center center", "label": "Centre" },
+        { "value": "right center", "label": "Droite" },
+        { "value": "center top", "label": "Haut" },
+        { "value": "center bottom", "label": "Bas" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "mobile_image_position",
+      "label": "Position de l’image mobile",
+      "default": "70% center",
+      "options": [
+        { "value": "center center", "label": "Centre" },
+        { "value": "60% center", "label": "Légèrement à droite" },
+        { "value": "70% center", "label": "À droite" },
+        { "value": "80% center", "label": "Très à droite" },
+        { "value": "center top", "label": "Haut" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "trust_1",
+      "label": "Engagement 1",
+      "default": "Fabrication française"
+    },
+    {
+      "type": "text",
+      "id": "trust_2",
+      "label": "Engagement 2",
+      "default": "Fils de qualité premium"
+    },
+    {
+      "type": "text",
+      "id": "trust_3",
+      "label": "Engagement 3",
+      "default": "+ de 2500 clients conquis"
+    }
+  ],
+  "presets": [
+    {
+      "name": "CeliArt — Hero"
+    }
+  ]
+}
+{% endschema %}

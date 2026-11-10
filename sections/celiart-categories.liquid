@@ -1,0 +1,133 @@
+{{ 'celiart-home.css' | asset_url | stylesheet_tag }}
+
+<section id="CeliartCategories-{{ section.id }}" class="celiart-section ca-categories">
+  <div class="celiart-wrap">
+    <header class="ca-fproducts__head ca-collections__head">
+      <div class="ca-fproducts__ornament" aria-hidden="true">
+        <svg viewBox="0 0 44 14"><path d="M1 7c6 0 8-5 12-5 3 0 4 2 6 5M13 7c4 0 6 3 8 5"/></svg>
+        <span class="heart">♥</span>
+        <svg viewBox="0 0 44 14"><path d="M43 7c-6 0-8-5-12-5-3 0-4 2-6 5M31 7c-4 0-6 3-8 5"/></svg>
+      </div>
+
+      <h2 class="ca-fproducts__title">
+        {{ section.settings.heading_main | escape }}
+        <span class="ca-fproducts__title-script">{{ section.settings.heading_script | escape }}</span>
+      </h2>
+
+      <div class="ca-fproducts__divider" aria-hidden="true"><span>♥</span></div>
+      <p class="ca-fproducts__subtitle">{{ section.settings.heading | escape }}</p>
+    </header>
+
+    <div class="ca-category-grid" data-celiart-category-track>
+      {% for block in section.blocks %}
+        {% render 'celiart-category-card', block: block %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+(() => {
+  const section = document.getElementById('CeliartCategories-{{ section.id }}');
+  if (!section || section.dataset.carouselReady === 'true') return;
+  section.dataset.carouselReady = 'true';
+
+  const track = section.querySelector('[data-celiart-category-track]');
+  const cards = Array.from(section.querySelectorAll('.ca-card'));
+  if (!track || !cards.length) return;
+
+  const mobileMq = window.matchMedia('(max-width: 599px)');
+  let raf = 0;
+
+  const nearestCard = () => {
+    const viewport = track.getBoundingClientRect();
+    const center = viewport.left + viewport.width / 2;
+    return cards.reduce((best, card) => {
+      const rect = card.getBoundingClientRect();
+      const distance = Math.abs((rect.left + rect.width / 2) - center);
+      return distance < best.distance ? { card, distance } : best;
+    }, { card: cards[0], distance: Infinity }).card;
+  };
+
+  const updateActiveCard = () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      if (!mobileMq.matches) {
+        cards.forEach(card => card.classList.remove('is-active'));
+        return;
+      }
+      const active = nearestCard();
+      cards.forEach(card => card.classList.toggle('is-active', card === active));
+    });
+  };
+
+  const resetToFirst = () => {
+    if (!mobileMq.matches) return;
+    track.scrollTo({ left: 0, behavior: 'auto' });
+    cards.forEach((card, index) => card.classList.toggle('is-active', index === 0));
+  };
+
+  track.addEventListener('scroll', updateActiveCard, { passive: true });
+  window.addEventListener('resize', updateActiveCard, { passive: true });
+
+  requestAnimationFrame(resetToFirst);
+
+  document.addEventListener('shopify:block:select', event => {
+    const card = event.target.closest('.ca-card');
+    if (!card || !section.contains(card) || !mobileMq.matches) return;
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "CeliArt — Catégories",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_main",
+      "label": "Début du titre",
+      "default": "Nos"
+    },
+    {
+      "type": "text",
+      "id": "heading_script",
+      "label": "Mot manuscrit",
+      "default": "Collections"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Description sous le titre",
+      "default": "Créez, personnalisez, célébrez."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Catégorie",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Titre", "default": "Femme" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "T-shirts, sweats & tote bags" },
+        { "type": "text", "id": "link_label", "label": "Libellé lien", "default": "Découvrir" },
+        { "type": "url", "id": "link", "label": "Lien" }
+      ]
+    }
+  ],
+  "max_blocks": 5,
+  "presets": [
+    {
+      "name": "CeliArt — Catégories",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

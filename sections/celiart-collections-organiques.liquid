@@ -1,0 +1,659 @@
+{% comment %}
+  Section CeliArt – Collections organiques
+  Compatible avec Shopify Horizon / Online Store 2.0
+{% endcomment %}
+
+<section
+  id="CeliArtCollections-{{ section.id }}"
+  class="celiart-collections"
+  style="
+    --celiart-background: {{ section.settings.background_color }};
+    --celiart-text: {{ section.settings.text_color }};
+    --celiart-accent: {{ section.settings.accent_color }};
+  "
+>
+  <div class="celiart-collections__inner">
+
+    <header class="celiart-collections__header">
+      {% if section.settings.eyebrow != blank %}
+        <p class="celiart-collections__eyebrow">
+          {{ section.settings.eyebrow }}
+        </p>
+      {% endif %}
+
+      {% if section.settings.heading != blank %}
+        <h2 class="celiart-collections__title">
+          {{ section.settings.heading }}
+        </h2>
+      {% endif %}
+
+      {% if section.settings.description != blank %}
+        <div class="celiart-collections__description">
+          {{ section.settings.description }}
+        </div>
+      {% endif %}
+
+      <span class="celiart-collections__stitched-line" aria-hidden="true"></span>
+    </header>
+
+    <div class="celiart-collections__grid">
+      {% for block in section.blocks %}
+        {% liquid
+          assign card_link = block.settings.link
+
+          if card_link == blank and block.settings.collection != blank
+            assign card_link = block.settings.collection.url
+          endif
+        %}
+
+        <article
+          class="celiart-card celiart-card--{{ forloop.index }}"
+          {{ block.shopify_attributes }}
+        >
+          <a
+            class="celiart-card__link"
+            href="{{ card_link | default: '#' }}"
+            aria-label="Découvrir la collection {{ block.settings.title | escape }}"
+          >
+            <div class="celiart-card__media">
+              {% if block.settings.image != blank %}
+                {{
+                  block.settings.image
+                  | image_url: width: 1200
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '400, 600, 800, 1000, 1200',
+                    sizes: '(min-width: 990px) 20vw, (min-width: 700px) 45vw, 88vw',
+                    class: 'celiart-card__image',
+                    alt: block.settings.title
+                }}
+              {% else %}
+                {{ 'collection-1' | placeholder_svg_tag: 'celiart-card__placeholder' }}
+              {% endif %}
+
+              <span class="celiart-card__overlay" aria-hidden="true"></span>
+
+              {% if block.settings.badge != blank %}
+                <span class="celiart-card__badge">
+                  {{ block.settings.badge }}
+                </span>
+              {% endif %}
+            </div>
+
+            <div class="celiart-card__content">
+              {% if block.settings.title != blank %}
+                <h3 class="celiart-card__title">
+                  {{ block.settings.title }}
+                </h3>
+              {% endif %}
+
+              {% if block.settings.subtitle != blank %}
+                <p class="celiart-card__subtitle">
+                  {{ block.settings.subtitle }}
+                </p>
+              {% endif %}
+
+              <span class="celiart-card__button">
+                {{ block.settings.button_label | default: 'Découvrir' }}
+                <span aria-hidden="true">→</span>
+              </span>
+            </div>
+          </a>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+
+  <span class="celiart-collections__thread celiart-collections__thread--one" aria-hidden="true"></span>
+  <span class="celiart-collections__thread celiart-collections__thread--two" aria-hidden="true"></span>
+</section>
+
+{% style %}
+  #CeliArtCollections-{{ section.id }} {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        circle at 10% 20%,
+        rgba(194, 126, 112, 0.08),
+        transparent 28%
+      ),
+      radial-gradient(
+        circle at 90% 80%,
+        rgba(194, 126, 112, 0.07),
+        transparent 30%
+      ),
+      var(--celiart-background);
+    color: var(--celiart-text);
+    padding: {{ section.settings.padding_top }}px 20px
+             {{ section.settings.padding_bottom }}px;
+  }
+
+  #CeliArtCollections-{{ section.id }}::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.22;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        rgba(92, 69, 60, 0.025) 0,
+        rgba(92, 69, 60, 0.025) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__inner {
+    position: relative;
+    z-index: 2;
+    width: min(100%, 1500px);
+    margin: 0 auto;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__header {
+    max-width: 720px;
+    margin: 0 auto 42px;
+    text-align: center;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__eyebrow {
+    margin: 0 0 10px;
+    color: var(--celiart-accent);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__title {
+    margin: 0;
+    color: var(--celiart-text);
+    font-family: var(--font-heading-family);
+    font-size: clamp(34px, 5vw, 64px);
+    font-weight: 400;
+    line-height: 1.05;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__description {
+    max-width: 620px;
+    margin: 16px auto 0;
+    font-size: 16px;
+    line-height: 1.65;
+    opacity: 0.78;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__stitched-line {
+    display: block;
+    width: 110px;
+    height: 1px;
+    margin: 20px auto 0;
+    border-top: 2px dashed var(--celiart-accent);
+    opacity: 0.65;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card {
+    position: relative;
+    min-width: 0;
+    transition:
+      transform 280ms ease,
+      filter 280ms ease;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(2),
+  #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(4) {
+    margin-top: 24px;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:hover {
+    z-index: 4;
+    transform: translateY(-8px) rotate(-0.6deg);
+    filter: drop-shadow(0 18px 20px rgba(78, 51, 44, 0.12));
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(even):hover {
+    transform: translateY(-8px) rotate(0.6deg);
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__link {
+    display: flex;
+    height: 100%;
+    min-height: 520px;
+    flex-direction: column;
+    overflow: hidden;
+    color: inherit;
+    text-decoration: none;
+    background: rgba(255, 252, 248, 0.84);
+    box-shadow: 0 10px 30px rgba(78, 51, 44, 0.07);
+  }
+
+  /*
+    Chaque carte possède un contour différent.
+    Ce ne sont pas de simples rectangles arrondis.
+  */
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(5n + 1) .celiart-card__link {
+    clip-path: polygon(
+      5% 2%,
+      90% 0%,
+      99% 8%,
+      98% 88%,
+      90% 98%,
+      10% 100%,
+      1% 91%,
+      2% 12%
+    );
+    border-radius: 36px 78px 42px 62px;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(5n + 2) .celiart-card__link {
+    clip-path: polygon(
+      8% 0%,
+      93% 3%,
+      100% 15%,
+      97% 92%,
+      86% 100%,
+      5% 97%,
+      0% 83%,
+      3% 10%
+    );
+    border-radius: 72px 34px 68px 40px;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(5n + 3) .celiart-card__link {
+    clip-path: polygon(
+      4% 5%,
+      88% 0%,
+      99% 10%,
+      100% 85%,
+      91% 99%,
+      12% 97%,
+      0% 90%,
+      2% 15%
+    );
+    border-radius: 46px 86px 36px 74px;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(5n + 4) .celiart-card__link {
+    clip-path: polygon(
+      10% 1%,
+      95% 5%,
+      98% 18%,
+      96% 91%,
+      83% 100%,
+      4% 96%,
+      1% 80%,
+      3% 9%
+    );
+    border-radius: 78px 42px 72px 38px;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(5n + 5) .celiart-card__link {
+    clip-path: polygon(
+      6% 0%,
+      91% 2%,
+      100% 12%,
+      97% 86%,
+      94% 98%,
+      13% 100%,
+      0% 92%,
+      2% 8%
+    );
+    border-radius: 38px 72px 52px 84px;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__media {
+    position: relative;
+    min-height: 380px;
+    flex: 1 1 auto;
+    overflow: hidden;
+    background: #eaded5;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__image,
+  #CeliArtCollections-{{ section.id }} .celiart-card__placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 380px;
+    object-fit: cover;
+    transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:hover .celiart-card__image {
+    transform: scale(1.055);
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        to top,
+        rgba(48, 29, 24, 0.30),
+        transparent 45%
+      );
+    pointer-events: none;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    max-width: calc(100% - 40px);
+    padding: 8px 12px;
+    color: #5d4037;
+    background: rgba(255, 250, 246, 0.88);
+    border: 1px solid rgba(194, 126, 112, 0.25);
+    border-radius: 99px;
+    backdrop-filter: blur(8px);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__content {
+    position: relative;
+    padding: 22px 18px 30px;
+    text-align: center;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 18%;
+    width: 64%;
+    border-top: 1px dashed rgba(194, 126, 112, 0.42);
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__title {
+    margin: 0;
+    font-family: var(--font-heading-family);
+    font-size: clamp(22px, 2.1vw, 31px);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__subtitle {
+    min-height: 42px;
+    margin: 10px 0 18px;
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.70;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding-bottom: 4px;
+    color: var(--celiart-accent);
+    border-bottom: 1px solid currentColor;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card__button span {
+    transition: transform 220ms ease;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-card:hover .celiart-card__button span {
+    transform: translateX(5px);
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__thread {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    width: 220px;
+    height: 110px;
+    opacity: 0.22;
+    border: 2px dashed var(--celiart-accent);
+    border-color: var(--celiart-accent) transparent transparent transparent;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__thread--one {
+    top: 70px;
+    left: -80px;
+    transform: rotate(24deg);
+  }
+
+  #CeliArtCollections-{{ section.id }} .celiart-collections__thread--two {
+    right: -90px;
+    bottom: 20px;
+    transform: rotate(-155deg);
+  }
+
+  @media screen and (max-width: 1199px) {
+    #CeliArtCollections-{{ section.id }} .celiart-collections__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(4),
+    #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(5) {
+      margin-top: 0;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #CeliArtCollections-{{ section.id }} {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    #CeliArtCollections-{{ section.id }} .celiart-collections__header {
+      margin-bottom: 28px;
+    }
+
+    #CeliArtCollections-{{ section.id }} .celiart-collections__grid {
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+
+    #CeliArtCollections-{{ section.id }} .celiart-card,
+    #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(2),
+    #CeliArtCollections-{{ section.id }} .celiart-card:nth-child(4) {
+      width: min(100%, 470px);
+      margin: 0 auto;
+    }
+
+    #CeliArtCollections-{{ section.id }} .celiart-card__link {
+      min-height: 490px;
+    }
+
+    #CeliArtCollections-{{ section.id }} .celiart-card__media,
+    #CeliArtCollections-{{ section.id }} .celiart-card__image,
+    #CeliArtCollections-{{ section.id }} .celiart-card__placeholder {
+      min-height: 360px;
+    }
+
+    #CeliArtCollections-{{ section.id }} .celiart-card__subtitle {
+      min-height: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #CeliArtCollections-{{ section.id }} .celiart-card,
+    #CeliArtCollections-{{ section.id }} .celiart-card__image,
+    #CeliArtCollections-{{ section.id }} .celiart-card__button span {
+      transition: none;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Collections organiques",
+  "tag": "section",
+  "class": "section-celiart-collections",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Petit texte supérieur",
+      "default": "Créez, personnalisez, célébrez"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Titre",
+      "default": "Trouvez votre univers"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Des créations brodées et personnalisées pour chaque moment de votre vie.</p>"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Couleur du fond",
+      "default": "#FAF5EF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte",
+      "default": "#49362F"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur d’accent",
+      "default": "#B96F65"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espace en haut",
+      "min": 20,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espace en bas",
+      "min": 20,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection Shopify"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Lien personnalisé",
+          "info": "Laissez vide pour utiliser automatiquement la collection Shopify."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre",
+          "default": "Femme"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Sous-titre",
+          "default": "T-shirts, sweats et tote bags"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Petit badge",
+          "default": "Personnalisation sur mesure"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texte du bouton",
+          "default": "Découvrir"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collections organiques CeliArt",
+      "category": "CeliArt",
+      "blocks": [
+        {
+          "type": "collection",
+          "settings": {
+            "title": "Femme",
+            "subtitle": "T-shirts, sweats et tote bags",
+            "badge": "Brodé à votre image"
+          }
+        },
+        {
+          "type": "collection",
+          "settings": {
+            "title": "Homme",
+            "subtitle": "T-shirts et sweats personnalisés",
+            "badge": "Créations uniques"
+          }
+        },
+        {
+          "type": "collection",
+          "settings": {
+            "title": "Bébé",
+            "subtitle": "Doudous, vêtements et couvertures",
+            "badge": "Doux et personnalisé"
+          }
+        },
+        {
+          "type": "collection",
+          "settings": {
+            "title": "Maison",
+            "subtitle": "Coussins et décoration personnalisée",
+            "badge": "Un intérieur à votre image"
+          }
+        },
+        {
+          "type": "collection",
+          "settings": {
+            "title": "Événements",
+            "subtitle": "Cadeaux, dragées et papeterie",
+            "badge": "Pour vos plus beaux moments"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

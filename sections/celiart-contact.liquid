@@ -1,0 +1,57 @@
+{{ 'celiart-contact.css' | asset_url | stylesheet_tag }}
+<section class="ca-contact" id="ca-contact-{{ section.id }}">
+  <div class="ca-contact__wrap">
+    <header class="ca-contact__head">
+      <div class="ca-contact__ornament" aria-hidden="true"><span></span><b>♥</b><span></span></div>
+      <h1><span>{{ section.settings.heading_main | escape }}</span> <em>{{ section.settings.heading_script | escape }}</em></h1>
+      <p>{{ section.settings.subtitle | escape }}</p>
+    </header>
+
+    <div class="ca-contact__layout">
+      <aside class="ca-contact__intro">
+        <span class="ca-contact__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        <h2>{{ section.settings.intro_title | escape }}</h2>
+        <p>{{ section.settings.intro_text | escape }}</p>
+        <div class="ca-contact__trust">
+          <div><span>♡</span><p><strong>Réponse personnalisée</strong><small>Sous 24 à 48 h ouvrées</small></p></div>
+          <div><span>✦</span><p><strong>Devis sans engagement</strong><small>Adapté à votre projet</small></p></div>
+          <div><span>✓</span><p><strong>Accompagnement humain</strong><small>Du premier échange à la création</small></p></div>
+        </div>
+      </aside>
+
+      <div class="ca-contact__card">
+        {% form 'contact', id: 'CeliartContactForm' %}
+          {% if form.posted_successfully? %}<div class="ca-contact__success" tabindex="-1">Merci ♡ Votre demande a bien été envoyée. Nous revenons vers vous rapidement.</div>{% endif %}
+          {% if form.errors %}<div class="ca-contact__errors">{{ form.errors | default_errors }}</div>{% endif %}
+
+          <div class="ca-contact__grid">
+            <label><span>Nom complet *</span><input type="text" name="contact[Nom]" value="{{ form.name }}" required autocomplete="name"></label>
+            <label><span>Email *</span><input type="email" name="contact[email]" value="{{ form.email }}" required autocomplete="email"></label>
+            <label><span>Téléphone</span><input type="tel" name="contact[Téléphone]" value="{{ form.phone }}" autocomplete="tel"></label>
+            <label><span>Type de demande *</span><select name="contact[Type de demande]" required><option value="">Choisir</option><option>Création sur mesure</option><option>Demande de devis</option><option>Commande événementielle</option><option>Professionnel / entreprise</option><option>Autre demande</option></select></label>
+            <label><span>Budget estimé</span><select name="contact[Budget estimé]"><option value="">Non défini</option><option>Moins de 100 €</option><option>100 à 300 €</option><option>300 à 700 €</option><option>Plus de 700 €</option></select></label>
+            <label><span>Date souhaitée</span><input type="date" name="contact[Date souhaitée]"></label>
+          </div>
+          <label class="ca-contact__wide"><span>Votre projet *</span><textarea name="contact[body]" rows="7" required placeholder="Décrivez votre idée, les quantités, les prénoms ou textes, les couleurs souhaitées et votre délai…">{{ form.body }}</textarea></label>
+          <label class="ca-contact__consent"><input type="checkbox" required><span>J’accepte d’être recontacté(e) au sujet de ma demande.</span></label>
+          <button type="submit">Envoyer ma demande <span aria-hidden="true">♡</span></button>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Contact CeliArt",
+  "settings": [
+    {"type":"text","id":"heading_main","label":"Début du titre","default":"Parlons de votre"},
+    {"type":"text","id":"heading_script","label":"Mot manuscrit","default":"projet"},
+    {"type":"text","id":"subtitle","label":"Sous-titre","default":"Une création particulière, un événement ou une demande de devis ? Racontez-nous votre idée."},
+    {"type":"text","id":"eyebrow","label":"Petit libellé","default":"Une idée unique ?"},
+    {"type":"text","id":"intro_title","label":"Titre introduction","default":"Créons quelque chose qui vous ressemble"},
+    {"type":"textarea","id":"intro_text","label":"Texte introduction","default":"Décrivez-nous votre projet. Nous étudions chaque demande avec soin pour vous proposer une création personnalisée et un devis adapté."}
+  ],
+  "presets": [{"name":"Contact CeliArt"}]
+}
+{% endschema %}

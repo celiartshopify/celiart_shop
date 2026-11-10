@@ -1,0 +1,438 @@
+{{ 'celiart-collection.css' | asset_url | stylesheet_tag }}
+
+<section id="CeliartCollection-{{ section.id }}" class="cc-collection" data-celiart-collection>
+  {% paginate collection.products by 24 %}
+    <div class="cc-banner">
+      <div class="cc-banner__media" aria-hidden="true">
+        {% assign banner_image = section.settings.banner_image | default: collection.image %}
+
+        {% if banner_image != blank %}
+          {{ banner_image
+            | image_url: width: 2200
+            | image_tag:
+              class: 'cc-banner__image',
+              loading: 'eager',
+              widths: '720,1000,1400,1800,2200',
+              sizes: '100vw',
+              alt: ''
+          }}
+        {% else %}
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'cc-banner__placeholder' }}
+        {% endif %}
+
+        <span class="cc-banner__veil"></span>
+      </div>
+
+      <div class="cc-shell cc-banner__content">
+        <div class="cc-banner__copy">
+          <div class="cc-banner__leaf" aria-hidden="true">
+            <svg viewBox="0 0 55 160">
+              <path d="M43 154C35 115 29 78 17 8"/>
+              <path d="M21 31C8 25 5 18 5 11c10 1 17 8 16 20Z"/>
+              <path d="M27 55c13-9 20-18 20-28-12 2-20 12-20 28Z"/>
+              <path d="M31 82C16 77 10 69 9 58c13 1 22 9 22 24Z"/>
+              <path d="M36 109c13-8 18-17 17-28-12 3-19 12-17 28Z"/>
+            </svg>
+          </div>
+
+          <h1 class="cc-banner__title cc-serif">
+            {% if section.settings.heading != blank %}
+              {{ section.settings.heading | escape }}
+            {% else %}
+              {{ collection.title | escape }}
+            {% endif %}
+          </h1>
+
+          <div class="cc-banner__divider" aria-hidden="true"><span>♥</span></div>
+
+          <div class="cc-banner__text">
+            {% if section.settings.description != blank %}
+              {{ section.settings.description }}
+            {% elsif collection.description != blank %}
+              {{ collection.description }}
+            {% else %}
+              <p>Découvrez toutes nos créations personnalisées, pensées avec soin pour chaque moment de votre vie.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="cc-banner__wave" aria-hidden="true"></div>
+    </div>
+
+    <div class="cc-main">
+      <div class="cc-shell cc-layout">
+        <div class="cc-filter-overlay" data-filter-overlay></div>
+
+        <aside class="cc-sidebar" data-filter-sidebar aria-label="Filtres produits">
+          <form class="cc-filter-panel" action="{{ collection.url }}" method="get" data-filter-form>
+            <div class="cc-filter-panel__head">
+              <h2 class="cc-filter-panel__title">Filtrer</h2>
+              <span class="cc-filter-panel__heart" aria-hidden="true">♡</span>
+
+              <button class="cc-filter-close" type="button" aria-label="Fermer les filtres" data-filter-close>
+                <svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>
+              </button>
+            </div>
+
+            {% if section.settings.category_menu != blank %}
+              <details class="cc-filter-group" open>
+                <summary>Catégories</summary>
+
+                <nav class="cc-filter-values" aria-label="Catégories">
+                  {% for link in section.settings.category_menu.links %}
+                    <a class="cc-category-link{% if link.active %} is-active{% endif %}" href="{{ link.url }}">
+                      <span>
+                        {{ link.title | escape }}
+                        {% if link.type == 'collection_link' and link.object != blank %}
+                          <span class="cc-category-link__count">({{ link.object.all_products_count }})</span>
+                        {% endif %}
+                      </span>
+                      <span aria-hidden="true">›</span>
+                    </a>
+                  {% endfor %}
+                </nav>
+              </details>
+            {% endif %}
+
+            {% for filter in collection.filters %}
+              {% render 'celiart-collection-filter', filter: filter %}
+            {% endfor %}
+
+            {% if collection.sort_by != blank %}
+              <input type="hidden" name="sort_by" value="{{ collection.sort_by }}">
+            {% endif %}
+
+            <div class="cc-filter-actions">
+              <button class="cc-filter-submit" type="submit">Appliquer</button>
+              <a class="cc-filter-reset" href="{{ collection.url }}">Effacer</a>
+            </div>
+
+            <div class="cc-special-card">
+              <div class="cc-special-card__ornament" aria-hidden="true"><span>♥</span></div>
+              <h3>{{ section.settings.contact_heading | escape }}</h3>
+              <p>{{ section.settings.contact_text | escape }}</p>
+              <a href="{{ section.settings.contact_link | default: routes.root_url }}">
+                {{ section.settings.contact_button | escape }} <span aria-hidden="true">♥</span>
+              </a>
+            </div>
+          </form>
+        </aside>
+
+        <div class="cc-content">
+          {% liquid
+            assign sort_by = collection.sort_by | default: collection.default_sort_by
+            assign first_item = paginate.current_offset | plus: 1
+            assign last_item = paginate.current_offset | plus: paginate.page_size
+
+            if last_item > paginate.items
+              assign last_item = paginate.items
+            endif
+
+            capture current_page_string
+              echo paginate.current_page
+            endcapture
+          %}
+
+          <div class="cc-toolbar">
+            <button class="cc-filter-open" type="button" data-filter-open aria-expanded="false">
+              <svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+              Filtres
+            </button>
+
+            <div class="cc-toolbar__count">
+              {% if paginate.items > 0 %}
+                Affichage de {{ first_item }}–{{ last_item }} sur {{ paginate.items }} résultats
+              {% else %}
+                Aucun résultat
+              {% endif %}
+            </div>
+
+            <div class="cc-toolbar__right">
+              <label class="cc-sort" for="SortBy-{{ section.id }}">
+                <span>Trier par</span>
+                <span class="cc-sort__select-wrap">
+                  <select id="SortBy-{{ section.id }}" data-sort-select>
+                    {% for option in collection.sort_options %}
+                      <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>
+                        {{ option.name | escape }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </span>
+              </label>
+
+              <div class="cc-view-toggle" aria-label="Affichage produits">
+                <button class="cc-view-button is-active" type="button" data-view="grid" aria-label="Vue grille" aria-pressed="true">
+                  <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg>
+                </button>
+
+                <button class="cc-view-button" type="button" data-view="list" aria-label="Vue liste" aria-pressed="false">
+                  <svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cc-product-grid" data-product-grid>
+            {% for product in collection.products %}
+              {% render 'celiart-collection-card', product: product %}
+            {% else %}
+              <p>Aucun produit ne correspond aux filtres sélectionnés.</p>
+            {% endfor %}
+          </div>
+
+          {% if paginate.pages > 1 %}
+            <nav class="cc-pagination" aria-label="Pagination">
+              {% if paginate.previous %}
+                <a href="{{ paginate.previous.url }}" aria-label="Page précédente">←</a>
+              {% endif %}
+
+              {% for part in paginate.parts %}
+                {% if part.is_link %}
+                  <a href="{{ part.url }}">{{ part.title }}</a>
+                {% elsif part.title == current_page_string %}
+                  <span class="is-current" aria-current="page">{{ part.title }}</span>
+                {% else %}
+                  <span class="is-gap">{{ part.title }}</span>
+                {% endif %}
+              {% endfor %}
+
+              {% if paginate.next %}
+                <a href="{{ paginate.next.url }}" aria-label="Page suivante">→</a>
+              {% endif %}
+            </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endpaginate %}
+
+  <div class="cc-newsletter">
+    <div class="cc-shell">
+      <div class="cc-newsletter__panel">
+        <div class="cc-newsletter__icon" aria-hidden="true">
+          <svg viewBox="0 0 96 96">
+            <path d="M13 27h70v52H13Z"/>
+            <path d="m13 29 35 27 35-27"/>
+            <path d="M31 18c5-7 14-5 17 2 3-7 12-9 17-2 7 10-17 25-17 25S24 28 31 18Z"/>
+            <path d="m13 78 27-26M83 78 56 52"/>
+          </svg>
+        </div>
+
+        <div class="cc-newsletter__copy">
+          <h2>{{ section.settings.newsletter_heading | escape }}</h2>
+          <p>{{ section.settings.newsletter_text | escape }}</p>
+        </div>
+
+        <div class="cc-newsletter__form-wrap">
+          {% form 'customer', class: 'cc-newsletter__customer-form' %}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+
+            <div class="cc-newsletter__form">
+              <label class="cc-visually-hidden" for="NewsletterEmail-{{ section.id }}">Adresse e-mail</label>
+              <input
+                class="cc-newsletter__input"
+                id="NewsletterEmail-{{ section.id }}"
+                type="email"
+                name="contact[email]"
+                value="{{ form.email }}"
+                placeholder="Votre adresse e-mail"
+                autocorrect="off"
+                autocapitalize="off"
+                autocomplete="email"
+                required
+              >
+              <button class="cc-newsletter__button" type="submit">
+                {{ section.settings.newsletter_button | escape }} <span>♥</span>
+              </button>
+            </div>
+
+            <label class="cc-newsletter__consent">
+              <input type="checkbox" required>
+              J’accepte de recevoir la newsletter
+            </label>
+
+            {% if form.posted_successfully? %}
+              <p class="cc-newsletter__message">Merci, votre inscription est confirmée.</p>
+            {% endif %}
+
+            {% if form.errors %}
+              <p class="cc-newsletter__message">{{ form.errors | default_errors }}</p>
+            {% endif %}
+          {% endform %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cc-trust">
+    <div class="cc-shell">
+      <div class="cc-trust__panel">
+        <div class="cc-trust__item">
+          <div class="cc-trust__icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><path d="M24 41S7 31 5 19C3.5 10 14 5 24 15 34 5 44.5 10 43 19 41 31 24 41 24 41Z"/><path d="M17 18c2-3 5-4 7-1"/></svg>
+          </div>
+          <div><h3>Fait avec amour</h3><p>Chaque création est réalisée avec soin</p></div>
+        </div>
+
+        <div class="cc-trust__item">
+          <div class="cc-trust__icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><path d="m11 36 3-11L33 6l9 9-19 19-12 2Z"/><path d="m14 25 9 9M29 10l9 9M11 36l7-2-5-5-2 7Z"/></svg>
+          </div>
+          <div><h3>Personnalisation</h3><p>Vos idées prennent vie</p></div>
+        </div>
+
+        <div class="cc-trust__item">
+          <div class="cc-trust__icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><path d="M9 38C13 22 22 11 40 7c1 19-10 31-31 31Z"/><path d="M10 37c8-8 15-14 27-24M20 29c0-5-1-8-3-11M27 23c4 0 7 1 10 3"/></svg>
+          </div>
+          <div><h3>Qualité & soin</h3><p>Des matériaux choisis avec attention</p></div>
+        </div>
+
+        <div class="cc-trust__item">
+          <div class="cc-trust__icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><path d="M13 18h22v23H13Z"/><path d="M9 18h30M24 18v23M11 11c0-4 5-6 8-3 3 3 5 10 5 10s-10-1-13-7ZM37 11c0-4-5-6-8-3-3 3-5 10-5 10s10-1 13-7Z"/></svg>
+          </div>
+          <div><h3>Livraison soignée</h3><p>Emballage délicat et sécurisé</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    function initCeliartCollection(section) {
+      if (!section || section.getAttribute('data-ready') === 'true') return;
+      section.setAttribute('data-ready', 'true');
+
+      var sidebar = section.querySelector('[data-filter-sidebar]');
+      var overlay = section.querySelector('[data-filter-overlay]');
+      var openButton = section.querySelector('[data-filter-open]');
+      var closeButton = section.querySelector('[data-filter-close]');
+      var filterForm = section.querySelector('[data-filter-form]');
+      var sortSelect = section.querySelector('[data-sort-select]');
+      var grid = section.querySelector('[data-product-grid]');
+      var viewButtons = section.querySelectorAll('[data-view]');
+      var wishButtons = section.querySelectorAll('[data-wishlist]');
+
+      function closeFilters() {
+        if (sidebar) sidebar.classList.remove('is-open');
+        if (overlay) overlay.classList.remove('is-open');
+        document.documentElement.style.overflow = '';
+        if (openButton) openButton.setAttribute('aria-expanded', 'false');
+      }
+
+      function openFilters() {
+        if (sidebar) sidebar.classList.add('is-open');
+        if (overlay) overlay.classList.add('is-open');
+        document.documentElement.style.overflow = 'hidden';
+        if (openButton) openButton.setAttribute('aria-expanded', 'true');
+      }
+
+      if (openButton) openButton.addEventListener('click', openFilters);
+      if (closeButton) closeButton.addEventListener('click', closeFilters);
+      if (overlay) overlay.addEventListener('click', closeFilters);
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeFilters();
+      });
+
+      if (sortSelect) {
+        sortSelect.addEventListener('change', function () {
+          var url = new URL(window.location.href);
+          url.searchParams.set('sort_by', sortSelect.value);
+          url.searchParams.delete('page');
+          window.location.assign(url.toString());
+        });
+      }
+
+      if (filterForm) {
+        var submitTimer;
+        var checkboxes = filterForm.querySelectorAll('input[type="checkbox"]');
+
+        checkboxes.forEach(function (input) {
+          input.addEventListener('change', function () {
+            if (window.matchMedia('(min-width: 990px)').matches) {
+              window.clearTimeout(submitTimer);
+              submitTimer = window.setTimeout(function () {
+                if (filterForm.requestSubmit) filterForm.requestSubmit();
+                else filterForm.submit();
+              }, 180);
+            }
+          });
+        });
+      }
+
+      viewButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var mode = button.getAttribute('data-view');
+
+          viewButtons.forEach(function (item) {
+            var active = item === button;
+            item.classList.toggle('is-active', active);
+            item.setAttribute('aria-pressed', active ? 'true' : 'false');
+          });
+
+          if (grid) grid.classList.toggle('is-list', mode === 'list');
+
+          try {
+            localStorage.setItem('celiartCollectionView', mode);
+          } catch (error) {}
+        });
+      });
+
+      try {
+        if (localStorage.getItem('celiartCollectionView') === 'list') {
+          var listButton = section.querySelector('[data-view="list"]');
+          if (listButton) listButton.click();
+        }
+      } catch (error) {}
+
+      wishButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var active = button.classList.toggle('is-active');
+          button.setAttribute('aria-pressed', active ? 'true' : 'false');
+          var path = button.querySelector('path');
+          if (path) path.style.fill = active ? 'currentColor' : 'none';
+        });
+      });
+    }
+
+    document.querySelectorAll('[data-celiart-collection]').forEach(initCeliartCollection);
+
+    document.addEventListener('shopify:section:load', function (event) {
+      initCeliartCollection(event.target.querySelector('[data-celiart-collection]'));
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "CeliArt catalogue",
+  "tag": "section",
+  "class": "section",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    { "type": "image_picker", "id": "banner_image", "label": "Image de bannière" },
+    { "type": "text", "id": "heading", "label": "Titre (vide = nom de collection)" },
+    { "type": "richtext", "id": "description", "label": "Description personnalisée" },
+    { "type": "link_list", "id": "category_menu", "label": "Menu des catégories" },
+    { "type": "header", "content": "Encart demande spéciale" },
+    { "type": "text", "id": "contact_heading", "label": "Titre", "default": "Une demande spéciale ?" },
+    { "type": "textarea", "id": "contact_text", "label": "Texte", "default": "Contactez-nous, nous créons avec vous." },
+    { "type": "text", "id": "contact_button", "label": "Bouton", "default": "Nous écrire" },
+    { "type": "url", "id": "contact_link", "label": "Lien" },
+    { "type": "header", "content": "Newsletter" },
+    { "type": "text", "id": "newsletter_heading", "label": "Titre", "default": "Rejoignez notre univers" },
+    { "type": "textarea", "id": "newsletter_text", "label": "Texte", "default": "Recevez nos nouveautés, inspirations et offres exclusives." },
+    { "type": "text", "id": "newsletter_button", "label": "Bouton", "default": "S’inscrire" }
+  ],
+  "presets": [
+    { "name": "CeliArt catalogue" }
+  ]
+}
+{% endschema %}

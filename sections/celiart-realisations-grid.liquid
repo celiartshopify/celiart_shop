@@ -1,0 +1,85 @@
+{{ 'celiart-home.css' | asset_url | stylesheet_tag }}
+{{ 'celiart-realisations.css' | asset_url | stylesheet_tag }}
+
+<section class="celiart-section ca-realisations-grid" id="ca-realisations-grid-{{ section.id }}">
+  <div class="celiart-wrap">
+    {% if section.settings.show_header %}
+      <header class="ca-fproducts__head">
+        <div class="ca-fproducts__ornament" aria-hidden="true">
+          <svg viewBox="0 0 44 14"><path d="M1 7c6 0 8-5 12-5 3 0 4 2 6 5M13 7c4 0 6 3 8 5"/></svg>
+          <span class="heart">♥</span>
+          <svg viewBox="0 0 44 14"><path d="M43 7c-6 0-8-5-12-5-3 0-4 2-6 5M31 7c-4 0-6 3-8 5"/></svg>
+        </div>
+
+        <h2 class="ca-fproducts__title">
+          {{ section.settings.heading_main | escape }}
+          <span class="ca-fproducts__title-script">{{ section.settings.heading_script | escape }}</span>
+        </h2>
+
+        <div class="ca-fproducts__divider" aria-hidden="true"><span>♥</span></div>
+        <p class="ca-fproducts__subtitle">{{ section.settings.subtitle | escape }}</p>
+      </header>
+    {% endif %}
+
+    <div class="ca-realisations-grid__items">
+      {% for block in section.blocks %}
+        <article class="ca-realisations-grid__item" {{ block.shopify_attributes }}>
+          {% if block.settings.image != blank %}
+            {{ block.settings.image | image_url: width: 1000 | image_tag:
+              loading: 'lazy',
+              widths: '320, 480, 640, 800, 1000',
+              sizes: '(max-width: 599px) calc((100vw - 44px) / 2), (max-width: 989px) 30vw, 300px',
+              alt: block.settings.title
+            }}
+          {% else %}
+            {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+          {% endif %}
+
+          {% if block.settings.title != blank or block.settings.category != blank %}
+            <div class="ca-realisations-grid__overlay">
+              {% if block.settings.title != blank %}<strong>{{ block.settings.title | escape }}</strong>{% endif %}
+              {% if block.settings.category != blank %}<span>{{ block.settings.category | escape }}</span>{% endif %}
+            </div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Grille réalisations",
+  "settings": [
+    { "type": "checkbox", "id": "show_header", "label": "Afficher l'entête", "default": true },
+    { "type": "text", "id": "heading_main", "label": "Début du titre", "default": "Nos" },
+    { "type": "text", "id": "heading_script", "label": "Mot manuscrit", "default": "réalisations" },
+    { "type": "text", "id": "subtitle", "label": "Sous-titre", "default": "Découvrez toutes nos créations personnalisées." }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Titre" },
+        { "type": "text", "id": "category", "label": "Catégorie" }
+      ]
+    }
+  ],
+  "max_blocks": 40,
+  "presets": [
+    {
+      "name": "Grille réalisations",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

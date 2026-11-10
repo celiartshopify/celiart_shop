@@ -1,0 +1,221 @@
+{{ 'celiart-home.css' | asset_url | stylesheet_tag }}
+<section class="celiart-section ca-fproducts" id="ca-fproducts-{{ section.id }}">
+  <div class="celiart-wrap">
+    <header class="ca-fproducts__head">
+      <div class="ca-fproducts__ornament" aria-hidden="true">
+        <svg viewBox="0 0 44 14"><path d="M1 7c6 0 8-5 12-5 3 0 4 2 6 5M13 7c4 0 6 3 8 5"/></svg>
+        <span class="heart">♥</span>
+        <svg viewBox="0 0 44 14"><path d="M43 7c-6 0-8-5-12-5-3 0-4 2-6 5M31 7c-4 0-6 3-8 5"/></svg>
+      </div>
+
+      <h2 class="ca-fproducts__title">
+        {{ section.settings.heading_main | escape }}
+        <span class="ca-fproducts__title-script">{{ section.settings.heading_script | escape }}</span>
+      </h2>
+
+      <div class="ca-fproducts__divider" aria-hidden="true"><span>♥</span></div>
+      <p class="ca-fproducts__subtitle">{{ section.settings.subtitle | escape }}</p>
+    </header>
+
+    <div class="ca-fproducts__carousel">
+      <button class="ca-fproducts__nav ca-fproducts__nav--prev" type="button" aria-label="Produits précédents" data-carousel-prev>
+        <svg viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg>
+      </button>
+
+      <div class="ca-fproducts__viewport" data-carousel-viewport>
+        <div class="ca-fproducts__track" data-carousel-track>
+          {% if section.blocks.size > 0 %}
+            {% for block in section.blocks %}
+              {% render 'celiart-featured-product-card', block: block %}
+            {% endfor %}
+          {% elsif section.settings.collection != blank %}
+            {% for product in section.settings.collection.products limit: 8 %}
+              {% render 'celiart-featured-product-card', product: product, fallback_kicker: section.settings.fallback_kicker, badge_icon: section.settings.fallback_icon, button_label: section.settings.button_label %}
+            {% endfor %}
+          {% else %}
+            {% for i in (1..5) %}
+              {% render 'celiart-featured-product-card', badge_icon: section.settings.fallback_icon, button_label: section.settings.button_label, fallback_kicker: section.settings.fallback_kicker %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <button class="ca-fproducts__nav ca-fproducts__nav--next" type="button" aria-label="Produits suivants" data-carousel-next>
+        <svg viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var section = document.getElementById('ca-fproducts-{{ section.id }}');
+      if (!section) return;
+
+      var viewport = section.querySelector('[data-carousel-viewport]');
+      var items = Array.prototype.slice.call(section.querySelectorAll('[data-carousel-item]'));
+      var prevButton = section.querySelector('[data-carousel-prev]');
+      var nextButton = section.querySelector('[data-carousel-next]');
+      if (!viewport || !items.length) return;
+
+      var mobileMq = window.matchMedia('(max-width: 599px)');
+      var frameRequested = false;
+      var scrollEndTimer;
+
+      function getNearestIndex() {
+        var viewportRect = viewport.getBoundingClientRect();
+        var viewportCenter = viewportRect.left + viewportRect.width / 2;
+        var bestIndex = 0;
+        var bestDistance = Infinity;
+
+        items.forEach(function(item, index) {
+          var rect = item.getBoundingClientRect();
+          var itemCenter = rect.left + rect.width / 2;
+          var distance = Math.abs(itemCenter - viewportCenter);
+
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestIndex = index;
+          }
+        });
+
+        return bestIndex;
+      }
+
+      function centerItem(index, behavior) {
+        var item = items[index];
+        if (!item) return;
+
+        var viewportRect = viewport.getBoundingClientRect();
+        var itemRect = item.getBoundingClientRect();
+        var distance = (itemRect.left + itemRect.width / 2) - (viewportRect.left + viewportRect.width / 2);
+
+        viewport.scrollBy({
+          left: distance,
+          behavior: behavior || 'smooth'
+        });
+      }
+
+      function updateButtons() {
+        var maximum = Math.max(0, viewport.scrollWidth - viewport.clientWidth - 2);
+        var current = viewport.scrollLeft;
+
+        if (prevButton) prevButton.disabled = current <= 2;
+        if (nextButton) nextButton.disabled = current >= maximum;
+      }
+
+      function updateActiveCard() {
+        var activeIndex = mobileMq.matches ? getNearestIndex() : -1;
+
+        items.forEach(function(item, index) {
+          item.classList.toggle('is-active', index === activeIndex);
+        });
+      }
+
+      function refreshCarousel() {
+        frameRequested = false;
+        updateButtons();
+        updateActiveCard();
+      }
+
+      function requestRefresh() {
+        if (frameRequested) return;
+        frameRequested = true;
+        window.requestAnimationFrame(refreshCarousel);
+      }
+
+      function scrollByCards(direction) {
+        var activeIndex = getNearestIndex();
+        var step = mobileMq.matches ? 1 : 2;
+        var targetIndex = Math.max(0, Math.min(items.length - 1, activeIndex + direction * step));
+        centerItem(targetIndex, 'smooth');
+      }
+
+      function handleScroll() {
+        requestRefresh();
+
+        /* Important : on ne force plus aucun recentrage pendant le swipe.
+           Le scroll-snap CSS laisse le geste tactile finir naturellement,
+           ce qui évite de revenir au produit précédent. */
+        window.clearTimeout(scrollEndTimer);
+        scrollEndTimer = window.setTimeout(requestRefresh, 140);
+      }
+
+      if (prevButton) {
+        prevButton.addEventListener('click', function() {
+          scrollByCards(-1);
+        });
+      }
+
+      if (nextButton) {
+        nextButton.addEventListener('click', function() {
+          scrollByCards(1);
+        });
+      }
+
+      viewport.addEventListener('scroll', handleScroll, { passive: true });
+      viewport.addEventListener('scrollend', requestRefresh, { passive: true });
+      window.addEventListener('resize', requestRefresh);
+
+      window.requestAnimationFrame(function() {
+        viewport.scrollTo({ left: 0, behavior: 'auto' });
+        updateButtons();
+        updateActiveCard();
+      });
+    })();
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "CeliArt — Produits",
+  "settings": [
+    { "type": "text", "id": "heading_main", "label": "Titre principal", "default": "Nos produits" },
+    { "type": "text", "id": "heading_script", "label": "Mot manuscrit", "default": "vedettes" },
+    { "type": "text", "id": "subtitle", "label": "Sous-titre", "default": "Des créations uniques, faites avec amour rien que pour vous." },
+    { "type": "collection", "id": "collection", "label": "Collection de secours (optionnel)" },
+    { "type": "text", "id": "fallback_kicker", "label": "Catégorie par défaut", "default": "Personnalisé" },
+    { "type": "text", "id": "button_label", "label": "Texte du bouton", "default": "Découvrir" },
+    { "type": "select", "id": "fallback_icon", "label": "Icône par défaut", "default": "heart", "options": [
+      { "value": "needle", "label": "Broderie" },
+      { "value": "bear", "label": "Bébé" },
+      { "value": "home", "label": "Maison" },
+      { "value": "shirt", "label": "Vêtement" },
+      { "value": "party", "label": "Événement" },
+      { "value": "heart", "label": "Cœur" }
+    ] }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Produit vedette",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Produit" },
+        { "type": "text", "id": "kicker", "label": "Petit libellé", "default": "Broderie personnalisée" },
+        { "type": "text", "id": "custom_title", "label": "Titre personnalisé (optionnel)" },
+        { "type": "text", "id": "button_label", "label": "Texte du bouton", "default": "Découvrir" },
+        { "type": "select", "id": "badge_icon", "label": "Icône", "default": "heart", "options": [
+          { "value": "needle", "label": "Broderie" },
+          { "value": "bear", "label": "Bébé" },
+          { "value": "home", "label": "Maison" },
+          { "value": "shirt", "label": "Vêtement" },
+          { "value": "party", "label": "Événement" },
+          { "value": "heart", "label": "Cœur" }
+        ] }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "CeliArt — Produits",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

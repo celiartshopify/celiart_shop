@@ -1,0 +1,56 @@
+{{ 'celiart-faq.css' | asset_url | stylesheet_tag }}
+<section class="celiart-faq" id="celiart-faq-{{ section.id }}">
+  <div class="celiart-faq__wrap">
+    {% if section.settings.show_header %}
+      <header class="celiart-faq__head">
+        <div class="celiart-faq__ornament" aria-hidden="true"><span>♥</span></div>
+        <h2 class="celiart-faq__title">{{ section.settings.heading_main | escape }} <em>{{ section.settings.heading_script | escape }}</em></h2>
+        {% if section.settings.subtitle != blank %}<p class="celiart-faq__subtitle">{{ section.settings.subtitle | escape }}</p>{% endif %}
+      </header>
+    {% endif %}
+
+    <div class="celiart-faq__list">
+      {% for block in section.blocks %}
+        <details class="celiart-faq__item" {{ block.shopify_attributes }} {% if block.settings.open_by_default %}open{% endif %}>
+          <summary class="celiart-faq__question">
+            <span>{{ block.settings.question | escape }}</span>
+            <span class="celiart-faq__plus" aria-hidden="true">+</span>
+          </summary>
+          <div class="celiart-faq__answer rte">{{ block.settings.answer }}</div>
+        </details>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FAQ CeliArt",
+  "settings": [
+    {"type":"checkbox","id":"show_header","label":"Afficher l’entête","default":true},
+    {"type":"text","id":"heading_main","label":"Titre principal","default":"Questions"},
+    {"type":"text","id":"heading_script","label":"Mot manuscrit","default":"fréquentes"},
+    {"type":"text","id":"subtitle","label":"Sous-titre","default":"Tout ce qu’il faut savoir sur nos créations personnalisées."}
+  ],
+  "blocks": [
+    {
+      "type":"question",
+      "name":"Question",
+      "settings":[
+        {"type":"text","id":"question","label":"Question","default":"Quels sont les délais de création ?"},
+        {"type":"richtext","id":"answer","label":"Réponse","default":"<p>Chaque création est préparée avec soin. Le délai exact est indiqué sur la fiche produit.</p>"},
+        {"type":"checkbox","id":"open_by_default","label":"Ouverte par défaut","default":false}
+      ]
+    }
+  ],
+  "max_blocks":20,
+  "presets":[{
+    "name":"FAQ CeliArt",
+    "blocks":[
+      {"type":"question","settings":{"question":"Quels sont les délais de création ?","answer":"<p>Chaque création est préparée avec soin. Le délai exact est indiqué sur la fiche produit.</p>"}},
+      {"type":"question","settings":{"question":"Puis-je choisir le texte et la couleur ?","answer":"<p>Oui, les options disponibles sont affichées directement sur chaque fiche produit.</p>"}},
+      {"type":"question","settings":{"question":"Les produits personnalisés sont-ils échangeables ?","answer":"<p>Les créations personnalisées étant réalisées spécialement pour vous, elles suivent des conditions particulières précisées dans nos politiques.</p>"}}
+    ]
+  }]
+}
+{% endschema %}

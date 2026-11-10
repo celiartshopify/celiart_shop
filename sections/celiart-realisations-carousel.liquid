@@ -1,0 +1,138 @@
+{{ 'celiart-home.css' | asset_url | stylesheet_tag }}
+{{ 'celiart-realisations.css' | asset_url | stylesheet_tag }}
+
+<section class="celiart-section ca-realisations" id="ca-realisations-{{ section.id }}">
+  <div class="celiart-wrap">
+    <header class="ca-fproducts__head">
+      <div class="ca-fproducts__ornament" aria-hidden="true">
+        <svg viewBox="0 0 44 14"><path d="M1 7c6 0 8-5 12-5 3 0 4 2 6 5M13 7c4 0 6 3 8 5"/></svg>
+        <span class="heart">♥</span>
+        <svg viewBox="0 0 44 14"><path d="M43 7c-6 0-8-5-12-5-3 0-4 2-6 5M31 7c-4 0-6 3-8 5"/></svg>
+      </div>
+
+      <h2 class="ca-fproducts__title">
+        {{ section.settings.heading_main | escape }}
+        <span class="ca-fproducts__title-script">{{ section.settings.heading_script | escape }}</span>
+      </h2>
+
+      <div class="ca-fproducts__divider" aria-hidden="true"><span>♥</span></div>
+      <p class="ca-fproducts__subtitle">{{ section.settings.subtitle | escape }}</p>
+    </header>
+
+    <div class="ca-realisations__carousel">
+      <button class="ca-realisations__nav ca-realisations__nav--prev" type="button" aria-label="Réalisations précédentes" data-real-prev>
+        <svg viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg>
+      </button>
+
+      <div class="ca-realisations__viewport" data-real-viewport>
+        <div class="ca-realisations__track">
+          {% for block in section.blocks %}
+            <article class="ca-realisation-card" {{ block.shopify_attributes }}>
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image_url: width: 900 | image_tag:
+                  loading: 'lazy',
+                  widths: '320, 480, 640, 900',
+                  sizes: '(max-width: 599px) 72vw, 280px',
+                  alt: block.settings.title
+                }}
+              {% else %}
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+
+              {% if block.settings.title != blank or block.settings.category != blank %}
+                <div class="ca-realisation-card__caption">
+                  {% if block.settings.title != blank %}<strong>{{ block.settings.title | escape }}</strong>{% endif %}
+                  {% if block.settings.category != blank %}<span>{{ block.settings.category | escape }}</span>{% endif %}
+                </div>
+              {% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button class="ca-realisations__nav ca-realisations__nav--next" type="button" aria-label="Réalisations suivantes" data-real-next>
+        <svg viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg>
+      </button>
+    </div>
+
+    {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+      <div class="ca-realisations__cta">
+        <a class="ca-realisations__button" href="{{ section.settings.button_link }}">{{ section.settings.button_label | escape }}</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    (() => {
+      const section = document.getElementById('ca-realisations-{{ section.id }}');
+      if (!section || section.dataset.ready === 'true') return;
+      section.dataset.ready = 'true';
+
+      const viewport = section.querySelector('[data-real-viewport]');
+      const cards = Array.from(section.querySelectorAll('.ca-realisation-card'));
+      const prev = section.querySelector('[data-real-prev]');
+      const next = section.querySelector('[data-real-next]');
+      if (!viewport || !cards.length) return;
+
+      const cardStep = () => {
+        const first = cards[0];
+        const track = first.parentElement;
+        const styles = track ? getComputedStyle(track) : null;
+        const gap = styles ? parseFloat(styles.columnGap || styles.gap || 0) : 0;
+        return first.getBoundingClientRect().width + gap;
+      };
+
+      const update = () => {
+        const max = Math.max(0, viewport.scrollWidth - viewport.clientWidth - 2);
+        if (prev) prev.disabled = viewport.scrollLeft <= 2;
+        if (next) next.disabled = viewport.scrollLeft >= max;
+      };
+
+      prev?.addEventListener('click', () => viewport.scrollBy({ left: -cardStep(), behavior: 'smooth' }));
+      next?.addEventListener('click', () => viewport.scrollBy({ left: cardStep(), behavior: 'smooth' }));
+      viewport.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+
+      requestAnimationFrame(() => {
+        viewport.scrollTo({ left: 0, behavior: 'auto' });
+        update();
+      });
+    })();
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "CeliArt réalisations",
+  "settings": [
+    { "type": "text", "id": "heading_main", "label": "Début du titre", "default": "Nos" },
+    { "type": "text", "id": "heading_script", "label": "Mot manuscrit", "default": "réalisations" },
+    { "type": "text", "id": "subtitle", "label": "Sous-titre", "default": "Découvrez quelques-unes de nos créations réalisées avec amour." },
+    { "type": "text", "id": "button_label", "label": "Texte du bouton", "default": "Voir toutes nos réalisations" },
+    { "type": "url", "id": "button_link", "label": "Lien du bouton" }
+  ],
+  "blocks": [
+    {
+      "type": "realisation",
+      "name": "Réalisation",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Titre", "default": "Création personnalisée" },
+        { "type": "text", "id": "category", "label": "Catégorie", "default": "Broderie" }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "CeliArt réalisations",
+      "blocks": [
+        { "type": "realisation" },
+        { "type": "realisation" },
+        { "type": "realisation" },
+        { "type": "realisation" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,186 @@
+{{ 'celiart-collection-hero.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign hero_image = section.settings.image
+  if hero_image == blank and collection.image != blank
+    assign hero_image = collection.image
+  endif
+
+  assign eyebrow = section.settings.eyebrow | strip
+  assign title_main = section.settings.title_main | strip
+  assign accent_text = section.settings.accent_text | strip
+
+  if title_main == blank
+    assign title_main = collection.title
+  endif
+%}
+
+<section
+  id="CeliArtCollectionHero-{{ section.id }}"
+  class="ca-collection-hero"
+  style="
+    --ca-ch-height-desktop: {{ section.settings.height_desktop }}px;
+    --ca-ch-height-mobile: {{ section.settings.height_mobile }}px;
+    --ca-ch-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --ca-ch-bg: {{ section.settings.background_color }};
+    --ca-ch-text: {{ section.settings.text_color }};
+    --ca-ch-accent: {{ section.settings.accent_color }};
+    --ca-ch-position: {{ section.settings.image_position }};
+  "
+>
+  <div class="ca-collection-hero__media" aria-hidden="true">
+    {% if hero_image != blank %}
+      {{ hero_image
+        | image_url: width: 2400
+        | image_tag:
+          loading: 'eager',
+          fetchpriority: 'high',
+          widths: '750, 1100, 1500, 1800, 2100, 2400',
+          sizes: '100vw',
+          class: 'ca-collection-hero__image',
+          alt: collection.title
+      }}
+    {% else %}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'ca-collection-hero__placeholder' }}
+    {% endif %}
+  </div>
+
+  <div class="ca-collection-hero__overlay" aria-hidden="true"></div>
+
+  <div class="ca-collection-hero__inner">
+    <div class="ca-collection-hero__copy">
+      {% if eyebrow != blank %}
+        <p class="ca-collection-hero__eyebrow">{{ eyebrow | escape }}</p>
+      {% endif %}
+
+      <h1 class="ca-collection-hero__title">
+        <span class="ca-collection-hero__title-main">{{ title_main | escape }}</span>
+        {% if accent_text != blank %}
+          <span class="ca-collection-hero__title-accent">
+            {{ accent_text | escape }}<span class="ca-collection-hero__heart" aria-hidden="true">♥</span>
+          </span>
+        {% endif %}
+      </h1>
+
+      {% if section.settings.show_description and collection.description != blank %}
+        <div class="ca-collection-hero__description rte">{{ collection.description }}</div>
+      {% elsif section.settings.description != blank %}
+        <div class="ca-collection-hero__description rte">{{ section.settings.description }}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="ca-collection-hero__wave" aria-hidden="true"></div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero collection",
+  "tag": "section",
+  "class": "section-celiart-collection-hero",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image de fond",
+      "info": "L’image de la collection est utilisée automatiquement si ce champ reste vide."
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Position de l’image",
+      "default": "center center",
+      "options": [
+        { "value": "left center", "label": "Gauche" },
+        { "value": "center center", "label": "Centre" },
+        { "value": "right center", "label": "Droite" },
+        { "value": "center top", "label": "Haut" },
+        { "value": "center bottom", "label": "Bas" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacité du voile",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 55
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Couleur du voile",
+      "default": "#f7efe8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte",
+      "default": "#30251f"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Couleur du mot accent",
+      "default": "#df9d9c"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Ligne manuscrite",
+      "default": "Vos idées,"
+    },
+    {
+      "type": "text",
+      "id": "title_main",
+      "label": "Titre principal",
+      "info": "Laissez vide pour afficher automatiquement le nom de la collection."
+    },
+    {
+      "type": "text",
+      "id": "accent_text",
+      "label": "Mot accent",
+      "default": "avec Amour"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Afficher la description de la collection",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description de secours",
+      "default": "<p>Des créations uniques pensées pour célébrer chaque moment.</p>"
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "label": "Hauteur ordinateur",
+      "min": 220,
+      "max": 460,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Hauteur mobile",
+      "min": 180,
+      "max": 340,
+      "step": 10,
+      "unit": "px",
+      "default": 230
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero collection"
+    }
+  ]
+}
+{% endschema %}
