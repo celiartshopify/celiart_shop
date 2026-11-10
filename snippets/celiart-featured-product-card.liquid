@@ -1,0 +1,108 @@
+{% liquid
+  if card_product != blank
+    assign chosen_product = card_product
+    assign custom_title = blank
+    assign card_link = chosen_product.url
+  elsif block != blank and block.settings.product != blank
+    assign chosen_product = block.settings.product
+    assign custom_title = block.settings.custom_title | strip
+    assign card_link = chosen_product.url | default: '#'
+  else
+    assign chosen_product = product
+    assign custom_title = blank
+    assign card_link = chosen_product.url | default: '#'
+  endif
+
+  if chosen_product != blank
+    assign card_title = custom_title | default: chosen_product.title
+  else
+    assign card_title = 'Produit personnalisé'
+  endif
+
+  comment
+    Libellé personnalisable par produit :
+    Shopify Admin → Paramètres → Données personnalisées → Produits
+    Créer un métachamp texte avec la clé custom.card_label.
+  endcomment
+  assign product_card_label = blank
+  if chosen_product != blank
+    assign product_card_label = chosen_product.metafields.custom.card_label.value
+  endif
+
+  if block != blank and block.settings.kicker != blank
+    assign kicker = block.settings.kicker
+  elsif product_card_label != blank
+    assign kicker = product_card_label
+  elsif chosen_product != blank and chosen_product.type != blank
+    assign kicker = chosen_product.type
+  else
+    assign kicker = fallback_kicker | default: 'Broderie personnalisée'
+  endif
+%}
+
+<article
+  class="ca-fproduct-card{% if native_product_card %} ca-fproduct-card--native{% endif %}"
+  {% if block and native_product_card != true %}{{ block.shopify_attributes }}{% endif %}
+  {% unless native_product_card %}data-carousel-item{% endunless %}
+>
+  <a class="ca-fproduct-card__media" href="{{ card_link }}" aria-label="{{ card_title | escape }}">
+    <span class="ca-fproduct-card__love-note" aria-hidden="true">
+      <span class="ca-fproduct-card__love-heart">♡</span>
+      Fait avec amour
+    </span>
+
+    {% if chosen_product != blank and chosen_product.featured_image != blank %}
+      {% render 'celiart-image', image: chosen_product.featured_image, alt: card_title, class: 'ca-fproduct-card__img', sizes: card_sizes, default: '(max-width: 599px) 48vw, (max-width: 989px) 33vw, 25vw' %}
+    {% else %}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {% endif %}
+  </a>
+
+  <div class="ca-fproduct-card__body">
+    <p class="ca-fproduct-card__kicker">{{ kicker | escape }}</p>
+
+    <h3 class="ca-fproduct-card__title">
+      <a href="{{ card_link }}">{{ card_title | escape }}</a>
+    </h3>
+
+    <p class="ca-fproduct-card__personal-note">
+      <span aria-hidden="true">♡</span>
+      Création unique pour vous
+    </p>
+
+    <div class="ca-fproduct-card__divider" aria-hidden="true">
+      <span></span><b>♥</b><span></span>
+    </div>
+
+    <div class="ca-fproduct-card__price">
+      {% if chosen_product != blank %}
+        {{ chosen_product.price | money }}
+      {% else %}
+        29,90 €
+      {% endif %}
+    </div>
+
+    <div class="ca-fproduct-card__mini-benefits" aria-label="Personnalisation et qualité">
+      <span>✦ Personnalisable</span>
+      <span>♡ Fait avec soin</span>
+    </div>
+  </div>
+</article>
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'celiart-image',
+            image: chosen_product.featured_image,
+            alt: card_title,
+            class: 'ca-fproduct-card__img',
+            sizes: card_sizes | default: '(max-width: 599px) 48vw, (max-width: 989px) 33vw, 25vw'
+          %}
+  to: "{% render 'celiart-image', image: chosen_product.featured_image, alt: card_title,
+    class: 'ca-fproduct-card__img', sizes: card_sizes, default: '(max-width: 599px)
+    48vw, (max-width: 989px) 33vw, 25vw' %}"
+  position: 2021..2222
+{% endcomment %}

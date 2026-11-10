@@ -1,0 +1,6 @@
+{% comment %}Reusable responsive image. Params: image, alt, class, widths, sizes{% endcomment %}
+{% if image != blank %}
+  {{ image | image_url: width: 2000 | image_tag: loading: 'lazy', widths: widths | default: '360,540,750,900,1200,1600,2000', sizes: sizes | default: '100vw', alt: alt, class: class }}
+{% else %}
+  {{ 'image' | placeholder_svg_tag: class }}
+{% endif %}

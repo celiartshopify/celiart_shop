@@ -1,0 +1,44 @@
+<details class="cc-filter-group" open>
+  <summary>{{ filter.label | escape }}</summary>
+
+  {% case filter.type %}
+    {% when 'boolean', 'list' %}
+      <div class="cc-filter-values">
+        {% for value in filter.values %}
+          <label class="cc-check" for="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}">
+            <input
+              id="Filter-{{ filter.param_name | escape }}-{{ forloop.index }}"
+              type="checkbox"
+              name="{{ value.param_name }}"
+              value="{{ value.value }}"
+              {% if value.active %}checked{% endif %}
+              {% if value.count == 0 and value.active == false %}disabled{% endif %}
+            >
+            <span class="cc-check__box" aria-hidden="true"></span>
+            <span>{{ value.label | escape }}</span>
+            <span class="cc-check__count">{{ value.count }}</span>
+          </label>
+        {% endfor %}
+      </div>
+
+    {% when 'price_range' %}
+      {% liquid
+        assign range_max = filter.range_max | money_without_currency | replace: ',', '.'
+        assign min_value = filter.min_value.value | default: 0 | money_without_currency | replace: ',', '.'
+        assign max_value = filter.max_value.value | default: filter.range_max | money_without_currency | replace: ',', '.'
+      %}
+      <div class="cc-price">
+        <div class="cc-price__fields">
+          <div class="cc-price__field">
+            <label for="Filter-{{ filter.min_value.param_name }}">Min.</label>
+            <input class="cc-price__input" id="Filter-{{ filter.min_value.param_name }}" type="number" name="{{ filter.min_value.param_name }}" value="{{ min_value }}" min="0" max="{{ range_max }}" inputmode="decimal">
+          </div>
+          <div class="cc-price__field">
+            <label for="Filter-{{ filter.max_value.param_name }}">Max.</label>
+            <input class="cc-price__input" id="Filter-{{ filter.max_value.param_name }}" type="number" name="{{ filter.max_value.param_name }}" value="{{ max_value }}" min="0" max="{{ range_max }}" inputmode="decimal">
+          </div>
+        </div>
+        <div class="cc-price__range" aria-hidden="true"></div>
+      </div>
+  {% endcase %}
+</details>

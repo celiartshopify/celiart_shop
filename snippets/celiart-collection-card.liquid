@@ -1,0 +1,85 @@
+{% liquid
+  assign media_alt = product.featured_media.alt | default: product.title
+  assign card_badge = product.metafields.custom.badge.value | default: ''
+
+  if card_badge == blank
+    if product.tags contains 'Nouveau' or product.tags contains 'NOUVEAU'
+      assign card_badge = 'Nouveau'
+    elsif product.tags contains 'Top vente' or product.tags contains 'TOP VENTE' or product.tags contains 'Bestseller'
+      assign card_badge = 'Top vente'
+    endif
+  endif
+%}
+
+<article class="cc-product-card">
+  {% if card_badge != blank %}
+    <span class="cc-product-card__badge">{{ card_badge | escape }}</span>
+  {% endif %}
+
+  <button
+    class="cc-product-card__wishlist"
+    type="button"
+    aria-label="Ajouter {{ product.title | escape }} aux favoris"
+    aria-pressed="false"
+    data-wishlist
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 20.2S4.3 15.6 3.1 10.5C2.2 6.8 4.5 4 8 4c1.8 0 3.3.8 4 2.1C12.8 4.8 14.3 4 16 4c3.5 0 5.8 2.8 4.9 6.5C19.7 15.6 12 20.2 12 20.2Z"/>
+    </svg>
+  </button>
+
+  <a class="cc-product-card__media" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+    {% if product.featured_media != blank %}
+      {{ product.featured_media
+        | image_url: width: 900
+        | image_tag:
+          class: 'cc-product-card__image',
+          loading: 'lazy',
+          widths: '260,360,480,640,760,900',
+          sizes: '(max-width: 699px) calc(50vw - 15px), (max-width: 1199px) 30vw, 20vw',
+          alt: media_alt
+      }}
+    {% else %}
+      {{ 'product-1' | placeholder_svg_tag: 'cc-product-card__placeholder' }}
+    {% endif %}
+  </a>
+
+  <div class="cc-product-card__body">
+    <h3 class="cc-product-card__title">
+      <a href="{{ product.url }}">{{ product.title | escape }}</a>
+    </h3>
+
+    <div class="cc-product-card__price">
+      {% if product.price_varies %}À partir de {% endif %}{{ product.price | money }}
+      {% if product.compare_at_price_max > product.price %}
+        <span class="cc-product-card__compare">{{ product.compare_at_price_max | money }}</span>
+      {% endif %}
+    </div>
+
+    <div class="cc-swatches" aria-label="Coloris disponibles">
+      {% assign swatches_rendered = false %}
+
+      {% for option in product.options_with_values %}
+        {% assign option_name = option.name | downcase %}
+        {% if option_name contains 'couleur' or option_name contains 'color' %}
+          {% for value in option.values limit: 5 %}
+            {% assign swatches_rendered = true %}
+            <span
+              class="cc-swatch"
+              title="{{ value | escape }}"
+              {% if value.swatch.color != blank %}style="--swatch:{{ value.swatch.color }}"{% endif %}
+            ></span>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+
+      {% unless swatches_rendered %}
+        {% if product.variants.size > 1 %}
+          {% for variant in product.variants limit: 4 %}
+            <span class="cc-swatch" style="--swatch:{% cycle '#bd9a82', '#e9d3c4', '#8b8f96', '#d29b8c' %}"></span>
+          {% endfor %}
+        {% endif %}
+      {% endunless %}
+    </div>
+  </div>
+</article>

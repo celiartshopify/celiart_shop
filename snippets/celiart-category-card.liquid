@@ -1,0 +1,8 @@
+<article class="ca-card" {{ block.shopify_attributes }}>
+  <div class="ca-card__media">{% render 'celiart-image', image: block.settings.image, alt: block.settings.title, class: 'ca-card__img', sizes: '(max-width: 599px) 148px, 20vw' %}</div>
+  <div class="ca-card__body">
+    <h3 class="ca-card__title">{{ block.settings.title }}</h3>
+    <p class="ca-card__desc">{{ block.settings.description }}</p>
+    <a class="ca-card__link" href="{{ block.settings.link | default: '#' }}">{{ block.settings.link_label }} </a>
+  </div>
+</article>
