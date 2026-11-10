@@ -1,0 +1,5 @@
+{{ 'overflow-list.css' | asset_url | preload_tag: as: 'style' }}
+{{ 'base.css' | asset_url | stylesheet_tag: preload: true }}
+{{ 'celiart-shared-product-card.css' | asset_url | stylesheet_tag }}
+
+{{ 'celiart-product-page.css' | asset_url | stylesheet_tag }}
