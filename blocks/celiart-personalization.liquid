@@ -1,0 +1,297 @@
+{% liquid
+  assign product_form_id = 'BuyButtons-ProductForm-' | append: section.id
+
+  assign choice_mode = product.metafields.custom.personalization_choice_mode.value | default: block.settings.choice_mode
+
+  if choice_mode == 'none'
+    assign fields_source = product.metafields.custom.personalization_text_fields.value
+    assign embroidery_colors_source = product.metafields.custom.personalization_colors.value
+  else
+    assign fields_source = product.metafields.custom.personalization_text_fields.value | default: block.settings.text_fields
+    assign embroidery_colors_source = product.metafields.custom.personalization_colors.value | default: block.settings.embroidery_colors
+  endif
+
+  assign text_fields = fields_source | newline_to_br | split: '<br />'
+  assign fonts_source = product.metafields.custom.personalization_fonts.value | default: block.settings.fonts
+  assign fonts = fonts_source | newline_to_br | split: '<br />'
+  assign preview_word = product.metafields.custom.personalization_preview_word.value | default: block.settings.preview_word | default: 'Amelia'
+  assign embroidery_colors = embroidery_colors_source | newline_to_br | split: '<br />'
+
+  assign design_images = product.metafields.custom.personalization_design_images.value
+  assign paid_options_source = product.metafields.custom.personalization_paid_options_text.value | default: block.settings.paid_options_text
+  assign paid_options = paid_options_source | newline_to_br | split: '<br />'
+
+  assign has_text_fields = false
+  for field in text_fields
+    assign field_check = field | strip
+    if field_check != blank
+      assign has_text_fields = true
+      break
+    endif
+  endfor
+
+  assign has_fonts = false
+  if choice_mode == 'fonts'
+    for font in fonts
+      assign font_check = font | strip
+      if font_check != blank
+        assign has_fonts = true
+        break
+      endif
+    endfor
+  endif
+
+  assign has_primary_designs = false
+  if choice_mode == 'designs' and design_images != blank
+    assign has_primary_designs = true
+  endif
+
+  assign has_embroidery_colors = false
+  if block.settings.show_colors and embroidery_colors_source != blank
+    for item in embroidery_colors
+      assign color_parts = item | split: '|'
+      assign color_label = color_parts[0] | strip
+      if color_label != blank
+        assign has_embroidery_colors = true
+        break
+      endif
+    endfor
+  endif
+
+  assign has_personalization_content = false
+  if has_text_fields or has_fonts or has_primary_designs or has_embroidery_colors
+    assign has_personalization_content = true
+  endif
+%}
+
+<div class="celiart-personalization{% unless has_personalization_content %} celiart-personalization--options-only{% endunless %}" {{ block.shopify_attributes }}>
+  {% if has_personalization_content %}
+    <div class="celiart-personalization__head">
+      <span class="celiart-personalization__eyebrow">{{ block.settings.heading | escape }}</span>
+      <p>{{ block.settings.subheading | escape }}</p>
+    </div>
+  {% endif %}
+
+  {% assign visible_field_index = 0 %}
+  {% for field in text_fields %}
+    {% assign clean_field = field | strip %}
+    {% if clean_field != blank %}
+      {% assign parts = clean_field | split: '|' %}
+      {% assign field_label = parts[0] | strip | default: 'Texte à broder' %}
+      {% assign field_placeholder = parts[1] | strip | default: field_label %}
+      {% assign field_max = parts[2] | strip | default: 20 %}
+      {% assign field_required_text = parts[3] | strip | downcase %}
+      {% assign field_required = false %}
+      {% if field_required_text == 'oui' or field_required_text == 'yes' or field_required_text == 'true' or field_required_text == 'requis' %}
+        {% assign field_required = true %}
+      {% endif %}
+      {% assign visible_field_index = visible_field_index | plus: 1 %}
+
+      <div class="celiart-personalization__field">
+        <label for="CeliartText-{{ section.id }}-{{ visible_field_index }}">
+          {{ visible_field_index }}. {{ field_label | escape }}{% if field_required %} <span aria-hidden="true">*</span>{% endif %}
+        </label>
+        <div class="celiart-personalization__input-wrap">
+          <input
+            id="CeliartText-{{ section.id }}-{{ visible_field_index }}"
+            type="text"
+            name="properties[{{ field_label | escape }}]"
+            maxlength="{{ field_max }}"
+            placeholder="{{ field_placeholder | escape }}"
+            form="{{ product_form_id }}"
+            {% if field_required %}required aria-required="true"{% endif %}
+          >
+          <span>{{ field_max }} max.</span>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+
+  {% if choice_mode == 'designs' and design_images != blank %}
+    <fieldset class="celiart-personalization__field celiart-personalization__designs">
+      <legend>{{ visible_field_index | plus: 1 }}. {{ block.settings.designs_label | escape }}{% if block.settings.choice_required %} <span aria-hidden="true">*</span>{% endif %}</legend>
+      <div class="celiart-personalization__design-grid">
+        {% for design_file in design_images %}
+          {% assign design_image = design_file.preview_image | default: design_file %}
+          {% assign design_value = 'Design ' | append: forloop.index %}
+          <label class="celiart-personalization__design-choice">
+            <input
+              type="radio"
+              name="properties[{{ block.settings.designs_property_name | escape }}]"
+              value="{{ design_value | escape }}"
+              form="{{ product_form_id }}"
+              {% if forloop.first %}checked{% endif %}
+              {% if block.settings.choice_required %}required{% endif %}
+            >
+            <span class="celiart-personalization__design-image">
+              {{ design_image | image_url: width: 360 | image_tag: loading: 'lazy', widths: '120,180,240,360', sizes: '(max-width: 749px) 30vw, 150px', alt: design_value }}
+            </span>
+          </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+  {% elsif choice_mode == 'fonts' %}
+    <fieldset class="celiart-personalization__field celiart-personalization__fonts">
+      <legend>{{ visible_field_index | plus: 1 }}. {{ block.settings.fonts_label | escape }}{% if block.settings.choice_required %} <span aria-hidden="true">*</span>{% endif %}</legend>
+      <div class="celiart-personalization__choices">
+        {% for font in fonts %}
+          {% assign clean_font = font | strip %}
+          {% if clean_font != blank %}
+            <label class="celiart-personalization__font-choice">
+              <input type="radio" name="properties[Police d’écriture]" value="{{ clean_font | escape }}" form="{{ product_form_id }}" {% if forloop.first %}checked{% endif %} {% if block.settings.choice_required %}required{% endif %}>
+              <span class="celiart-personalization__font-sample celiart-font-{{ forloop.index }}">{{ preview_word | escape }}</span>
+            </label>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </fieldset>
+  {% endif %}
+
+  {% if has_embroidery_colors %}
+    <fieldset class="celiart-personalization__field celiart-personalization__colors">
+      <legend>{{ visible_field_index | plus: 2 }}. Couleur de broderie{% if block.settings.color_required %} <span aria-hidden="true">*</span>{% endif %}</legend>
+      <div class="celiart-personalization__swatches">
+        {% for item in embroidery_colors %}
+          {% assign pair = item | split: '|' %}
+          {% assign color_name = pair[0] | strip %}
+          {% assign color_value = pair[1] | strip | default: '#d79a9f' %}
+          {% if color_name != blank %}
+            <label title="{{ color_name | escape }}">
+              <input type="radio" name="properties[Couleur de broderie]" value="{{ color_name | escape }}" form="{{ product_form_id }}" {% if forloop.first %}checked{% endif %} {% if block.settings.color_required %}required{% endif %}>
+              <span style="--swatch: {{ color_value }}"></span>
+              <small>{{ color_name }}</small>
+            </label>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </fieldset>
+  {% endif %}
+
+  {% if paid_options_source != blank %}
+    <fieldset
+      class="celiart-personalization__field celiart-personalization__paid-options"
+      data-celiart-paid-options
+      data-surcharge-option-name="{{ block.settings.surcharge_option_name | escape }}"
+      data-surcharge-empty-value="{{ block.settings.surcharge_empty_value | escape }}"
+    >
+      <legend>{{ block.settings.paid_options_label | escape }}</legend>
+      <div class="celiart-personalization__paid-list">
+        {% for option_line in paid_options %}
+          {% assign clean_option = option_line | strip %}
+          {% if clean_option != blank %}
+            {% assign option_parts = clean_option | split: '|' %}
+            {% assign option_label = option_parts[0] | strip %}
+            {% assign option_price_text = option_parts[1] | strip %}
+            {% assign option_third = option_parts[2] | strip %}
+            {% assign option_third_normalized = option_third | downcase %}
+            {% assign option_fourth = option_parts[3] | strip | downcase %}
+            {% assign option_variant_value = option_third | default: option_label %}
+            {% assign option_trigger_designs = false %}
+            {% if option_third_normalized == 'show_designs' %}
+              {% assign option_variant_value = option_label %}
+              {% assign option_trigger_designs = true %}
+            {% elsif option_fourth == 'show_designs' %}
+              {% assign option_trigger_designs = true %}
+            {% endif %}
+            {% if option_label != blank %}
+              <label class="celiart-personalization__paid-option">
+                <input
+                  type="checkbox"
+                  data-celiart-surcharge-check
+                  data-surcharge-value="{{ option_variant_value | escape }}"
+                  data-surcharge-display-price="{{ option_price_text | escape }}"
+                  {% if option_trigger_designs %}data-show-designs="true"{% endif %}
+                  aria-label="Ajouter {{ option_label | escape }}{% if option_price_text != blank %} pour {{ option_price_text | escape }}{% endif %}"
+                >
+                <span class="celiart-personalization__paid-check" aria-hidden="true"></span>
+                <span class="celiart-personalization__paid-copy">
+                  <strong>{{ option_label | escape }}</strong>
+                </span>
+                {% if option_price_text != blank %}
+                  <span class="celiart-personalization__paid-price">+ {{ option_price_text | escape }}</span>
+                {% endif %}
+              </label>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if choice_mode != 'designs' and design_images != blank %}
+        <fieldset
+          class="celiart-personalization__field celiart-personalization__designs celiart-personalization__conditional-designs"
+          data-celiart-conditional-designs
+          data-design-required="{% if block.settings.choice_required %}true{% else %}false{% endif %}"
+          hidden
+        >
+          <legend>{{ block.settings.designs_label | escape }}{% if block.settings.choice_required %} <span aria-hidden="true">*</span>{% endif %}</legend>
+          <div class="celiart-personalization__design-grid">
+            {% for design_file in design_images %}
+              {% assign design_image = design_file.preview_image | default: design_file %}
+              {% assign design_value = 'Design ' | append: forloop.index %}
+              <label class="celiart-personalization__design-choice">
+                <input
+                  type="radio"
+                  name="properties[{{ block.settings.designs_property_name | escape }}]"
+                  value="{{ design_value | escape }}"
+                  form="{{ product_form_id }}"
+                  data-celiart-conditional-design-input
+                  disabled
+                >
+                <span class="celiart-personalization__design-image">
+                  {{ design_image | image_url: width: 360 | image_tag: loading: 'lazy', widths: '120,180,240,360', sizes: '(max-width: 749px) 30vw, 150px', alt: design_value }}
+                </span>
+              </label>
+            {% endfor %}
+          </div>
+          <p class="celiart-personalization__paid-help" data-celiart-design-help hidden>Veuillez sélectionner un design.</p>
+        </fieldset>
+      {% endif %}
+
+      <p class="celiart-personalization__paid-help" data-celiart-paid-help hidden></p>
+      <div class="celiart-personalization__total" data-celiart-total-wrap>
+        <span>Montant Total</span>
+        <strong data-celiart-total>{{ product.selected_or_first_available_variant.price | money }}</strong>
+      </div>
+      <script type="application/json" data-celiart-variant-prices>
+        {
+          {% for variant in product.variants %}
+            "{{ variant.id }}": {{ variant.price }}{% unless forloop.last %},{% endunless %}
+          {% endfor %}
+        }
+      </script>
+    </fieldset>
+  {% endif %}
+
+  {% if has_personalization_content %}
+    <div class="celiart-personalization__note"><span class="celiart-personalization__note-heart" aria-hidden="true">♡</span><span>{{ block.settings.note }}</span></div>
+  {% endif %}
+</div>
+
+<script src="{{ 'celiart-personalization.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Personnalisation CeliArt",
+  "settings": [
+    {"type":"text","id":"heading","label":"Titre","default":"Personnalisez votre création"},
+    {"type":"text","id":"subheading","label":"Sous-titre","default":"Configurez les options proposées pour ce produit."},
+    {"type":"textarea","id":"text_fields","label":"Champs texte par défaut","info":"Une ligne par champ : Libellé|Placeholder|Maximum|oui/non","default":"Prénom ou texte à broder|Ex : Léonie|15|oui"},
+    {"type":"select","id":"choice_mode","label":"Type de choix par défaut","default":"fonts","options":[{"value":"fonts","label":"Polices"},{"value":"designs","label":"Designs en images"},{"value":"none","label":"Aucun"}]},
+    {"type":"text","id":"fonts_label","label":"Titre du choix de police","default":"Police d’écriture"},
+    {"type":"text","id":"preview_word","label":"Mot aperçu","default":"Amelia"},
+    {"type":"textarea","id":"fonts","label":"Polices (une par ligne)","default":"Allura\nScript classique\nGeorgia\nTimes élégant\nSans serif"},
+    {"type":"text","id":"designs_label","label":"Titre du choix de design","default":"Choisissez votre design"},
+    {"type":"text","id":"designs_property_name","label":"Nom enregistré dans la commande","default":"Design choisi"},
+    {"type":"checkbox","id":"choice_required","label":"Choix obligatoire","default":true},
+    {"type":"checkbox","id":"show_colors","label":"Afficher les couleurs de broderie","default":true},
+    {"type":"textarea","id":"embroidery_colors","label":"Couleurs : Nom|code hexadécimal","default":"Rose|#d9828b\nRouge|#b94343\nOrange|#d8874a\nJaune|#d8b94e\nVert|#78936f\nBleu|#6688a8\nViolet|#80678f\nMarron|#77513d\nBeige|#d8c1a4\nBlanc|#ffffff\nGris|#909090\nNoir|#222222\nOr|#b79542\nArgent|#a8adb2"},
+    {"type":"checkbox","id":"color_required","label":"Couleur obligatoire","default":true},
+    {"type":"text","id":"paid_options_label","label":"Titre des options payantes","default":"Options supplémentaires"},
+    {"type":"textarea","id":"paid_options_text","label":"Options payantes par défaut","info":"Une ligne : Libellé|Prix affiché|Valeur de variante|flag optionnel. Utilisez show_designs en 4e position, ou en 3e si la valeur de variante est identique au libellé.","default":"Petit cœur brodé|2,00 €|Petit cœur brodé"},
+    {"type":"text","id":"surcharge_option_name","label":"Nom de l’option variante tarifaire","default":"Suppléments"},
+    {"type":"text","id":"surcharge_empty_value","label":"Valeur sans supplément","default":"Aucun"},
+    {"type":"text","id":"note","label":"Message rassurant","default":"Chaque création est personnalisée avec le plus grand soin dans notre atelier."}
+  ],
+  "presets": [{"name":"Personnalisation CeliArt"}]
+}
+{% endschema %}
