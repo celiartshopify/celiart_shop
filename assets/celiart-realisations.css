@@ -1,0 +1,333 @@
+/* =========================================================
+   CELIART — RÉALISATIONS
+   Composants isolés : carousel accueil + grille page
+========================================================= */
+
+.ca-realisations,
+.ca-realisations-grid {
+  --ca-real-bg: #fffaf6;
+  --ca-real-border: #e3cfc0;
+  --ca-real-text: #3f2c25;
+  --ca-real-rose: #cf8585;
+  --ca-real-shadow: 0 12px 30px rgba(69, 45, 34, .09);
+  overflow: clip;
+}
+
+.ca-realisations .celiart-wrap,
+.ca-realisations-grid .celiart-wrap {
+  width: min(1320px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+/* Même entête que Nos Collections / Nos Produits vedettes */
+.ca-realisations .ca-fproducts__head,
+.ca-realisations-grid .ca-fproducts__head {
+  max-width: 900px;
+  margin: 0 auto 34px;
+  text-align: center;
+}
+
+/* ---------- Carousel accueil ---------- */
+.ca-realisations {
+  padding: 34px 0 76px;
+}
+
+.ca-realisations__carousel {
+  position: relative;
+}
+
+.ca-realisations__viewport {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  padding: 8px 6px 18px;
+}
+
+.ca-realisations__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.ca-realisations__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 1fr);
+  gap: 18px;
+  width: max-content;
+  min-width: 100%;
+}
+
+.ca-realisation-card {
+  position: relative;
+  width: clamp(220px, 20vw, 300px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(202, 174, 156, .72);
+  background: #f5ebe3;
+  box-shadow: var(--ca-real-shadow);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  transform: translateZ(0);
+}
+
+.ca-realisation-card::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: 2;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, .68);
+  border-radius: 17px;
+}
+
+.ca-realisation-card img,
+.ca-realisation-card .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform .55s ease;
+}
+
+.ca-realisation-card:hover img {
+  transform: scale(1.035);
+}
+
+.ca-realisation-card__caption {
+  position: absolute;
+  inset: auto 10px 10px;
+  z-index: 3;
+  padding: 12px 14px;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(48, 30, 23, .08), rgba(48, 30, 23, .62));
+  backdrop-filter: blur(3px);
+  text-align: center;
+}
+
+.ca-realisation-card__caption strong {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+.ca-realisation-card__caption span {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  opacity: .9;
+}
+
+.ca-realisations__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 5;
+  width: 50px;
+  height: 50px;
+  border: 1px solid rgba(185, 145, 124, .2);
+  border-radius: 50%;
+  background: rgba(255, 250, 246, .96);
+  color: #5b3d31;
+  box-shadow: 0 10px 24px rgba(69, 45, 34, .12);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.ca-realisations__nav--prev { left: -18px; }
+.ca-realisations__nav--next { right: -18px; }
+.ca-realisations__nav[disabled] { opacity: .35; cursor: default; }
+.ca-realisations__nav svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+.ca-realisations__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.ca-realisations__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 25px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #dc9898 0%, #cf8585 100%);
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  box-shadow: 0 8px 18px rgba(187, 111, 111, .18);
+}
+
+/* ---------- Grille page Nos réalisations ---------- */
+.ca-realisations-grid {
+  padding: 44px 0 84px;
+}
+
+.ca-realisations-grid__items {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.ca-realisations-grid__item {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  border: 1px solid rgba(202, 174, 156, .65);
+  border-radius: 20px;
+  background: #f4e9e0;
+  box-shadow: 0 10px 26px rgba(69, 45, 34, .075);
+}
+
+.ca-realisations-grid__item::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: 2;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, .62);
+  border-radius: 15px;
+}
+
+.ca-realisations-grid__item img,
+.ca-realisations-grid__item .placeholder-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform .55s ease;
+}
+
+.ca-realisations-grid__item:hover img {
+  transform: scale(1.035);
+}
+
+.ca-realisations-grid__overlay {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 3;
+  padding: 34px 16px 15px;
+  color: #fff;
+  background: linear-gradient(180deg, transparent, rgba(45, 28, 21, .62));
+}
+
+.ca-realisations-grid__overlay strong {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.ca-realisations-grid__overlay span {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .9;
+}
+
+@media (max-width: 989px) {
+  .ca-realisations .celiart-wrap,
+  .ca-realisations-grid .celiart-wrap {
+    width: min(100% - 36px, 920px);
+  }
+
+  .ca-realisations-grid__items {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ca-realisations__nav { display: none; }
+}
+
+@media (max-width: 599px) {
+  .ca-realisations {
+    padding: 20px 0 54px;
+  }
+
+  .ca-realisations .celiart-wrap,
+  .ca-realisations-grid .celiart-wrap {
+    width: 100%;
+  }
+
+  .ca-realisations .ca-fproducts__head,
+  .ca-realisations-grid .ca-fproducts__head {
+    padding-inline: 18px;
+    margin-bottom: 22px;
+  }
+
+  .ca-realisations__viewport {
+    padding: 8px 16px 18px;
+    scroll-padding-inline: 16px;
+  }
+
+  .ca-realisations__track {
+    gap: 13px;
+    min-width: auto;
+  }
+
+  .ca-realisation-card {
+    width: 72vw;
+    max-width: 290px;
+    border-radius: 19px;
+    scroll-snap-align: center;
+  }
+
+  .ca-realisation-card::after { border-radius: 14px; }
+
+  .ca-realisations__cta {
+    padding-inline: 18px;
+    margin-top: 16px;
+  }
+
+  .ca-realisations-grid {
+    padding: 28px 16px 58px;
+  }
+
+  .ca-realisations-grid__items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .ca-realisations-grid__item {
+    border-radius: 16px;
+  }
+
+  .ca-realisations-grid__item::after {
+    inset: 4px;
+    border-radius: 12px;
+  }
+
+  .ca-realisations-grid__overlay {
+    padding: 26px 10px 10px;
+  }
+
+  .ca-realisations-grid__overlay strong {
+    font-size: 14px;
+  }
+}
+
+
+/* CeliArt — réalisations : gestes verticaux libres, snap horizontal strict */
+.ca-realisations__viewport {
+  touch-action: pan-x pan-y pinch-zoom !important;
+  overscroll-behavior-y: auto !important;
+  scroll-snap-type: x mandatory !important;
+}
+.ca-realisation-card {
+  scroll-snap-stop: always;
+}

@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Allura&display=swap');
+
+.section-celiart-collection-hero{
+  width:100%;
+  min-width:0;
+  overflow:visible;
+}
+
+.ca-collection-hero{
+  --ca-ch-height-desktop:300px;
+  --ca-ch-height-mobile:230px;
+  --ca-ch-overlay:.55;
+  --ca-ch-bg:#f7efe8;
+  --ca-ch-text:#30251f;
+  --ca-ch-accent:#df9d9c;
+  --ca-ch-position:center center;
+  position:relative;
+  width:100%;
+  min-width:0;
+  height:var(--ca-ch-height-desktop);
+  overflow:hidden;
+  isolation:isolate;
+  background:var(--ca-ch-bg);
+  color:var(--ca-ch-text);
+}
+
+.ca-collection-hero__media,
+.ca-collection-hero__overlay{
+  position:absolute;
+  inset:0;
+}
+
+.ca-collection-hero__media{z-index:0}
+
+.ca-collection-hero__image,
+.ca-collection-hero__placeholder{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:var(--ca-ch-position);
+}
+
+.ca-collection-hero__placeholder{
+  padding:24px;
+  color:#cdb9ab;
+  background:#eaded4;
+}
+
+.ca-collection-hero__overlay{
+  z-index:1;
+  background:color-mix(in srgb,var(--ca-ch-bg) calc(var(--ca-ch-overlay) * 100%),transparent);
+}
+
+@supports not (background:color-mix(in srgb,white 50%,transparent)){
+  .ca-collection-hero__overlay{
+    background:var(--ca-ch-bg);
+    opacity:var(--ca-ch-overlay);
+  }
+}
+
+.ca-collection-hero__inner{
+  position:relative;
+  z-index:3;
+  width:min(1480px,calc(100% - 48px));
+  height:100%;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+}
+
+.ca-collection-hero__copy{
+  width:min(620px,55%);
+  padding:24px 0 40px;
+}
+
+.ca-collection-hero__eyebrow{
+  margin:0 0 2px;
+  font-family:"Allura","Snell Roundhand","Segoe Script",cursive;
+  font-size:35px;
+  font-weight:400;
+  line-height:1;
+  color:#6f5148;
+}
+
+.ca-collection-hero__title{
+  margin:0;
+  font-family:Georgia,"Times New Roman",serif;
+  font-weight:400;
+  letter-spacing:-.035em;
+  color:var(--ca-ch-text);
+}
+
+.ca-collection-hero__title-main,
+.ca-collection-hero__title-accent{display:block}
+
+.ca-collection-hero__title-main{
+  font-size:clamp(40px,4.2vw,61px);
+  line-height:.96;
+}
+
+.ca-collection-hero__title-accent{
+  margin-top:3px;
+  font-size:clamp(44px,4.65vw,68px);
+  line-height:.91;
+  color:var(--ca-ch-accent);
+}
+
+.ca-collection-hero__heart{
+  display:inline-block;
+  margin-left:7px;
+  font-family:Arial,sans-serif;
+  font-size:.22em;
+  vertical-align:.22em;
+}
+
+.ca-collection-hero__description{
+  width:min(470px,100%);
+  margin-top:14px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:15px;
+  line-height:1.42;
+  color:#503d36;
+}
+
+.ca-collection-hero__description p{margin:0}
+
+.ca-collection-hero__wave{
+  position:absolute;
+  z-index:5;
+  left:-1%;
+  right:-1%;
+  bottom:-1px;
+  height:28px;
+  background:var(--color-background,var(--ca-paper,#fffaf4));
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 70' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0 24 C110 8 210 42 325 28 C440 14 530 48 650 30 C780 10 900 46 1025 28 C1150 12 1260 44 1375 26 C1460 14 1535 22 1600 8 L1600 70 L0 70 Z'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 70' preserveAspectRatio='none'%3E%3Cpath fill='black' d='M0 24 C110 8 210 42 325 28 C440 14 530 48 650 30 C780 10 900 46 1025 28 C1150 12 1260 44 1375 26 C1460 14 1535 22 1600 8 L1600 70 L0 70 Z'/%3E%3C/svg%3E");
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  pointer-events:none;
+}
+
+@media(max-width:749px){
+  .ca-collection-hero{
+    height:var(--ca-ch-height-mobile);
+  }
+
+  .ca-collection-hero__inner{
+    width:calc(100% - 32px);
+  }
+
+  .ca-collection-hero__copy{
+    width:min(82%,340px);
+    padding:22px 0 30px;
+  }
+
+  .ca-collection-hero__eyebrow{
+    font-size:27px;
+  }
+
+  .ca-collection-hero__title-main{
+    font-size:36px;
+  }
+
+  .ca-collection-hero__title-accent{
+    font-size:41px;
+  }
+
+  .ca-collection-hero__description{
+    max-width:270px;
+    margin-top:11px;
+    font-size:12.5px;
+    line-height:1.35;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
+  }
+
+  .ca-collection-hero__wave{height:20px}
+}

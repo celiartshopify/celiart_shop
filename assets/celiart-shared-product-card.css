@@ -1,0 +1,357 @@
+/* ==========================================================
+   CeliArt — carte produit éditoriale partagée
+   Utilisée sur la Home, les collections, la recherche et les recommandations.
+   Aucun bouton : l'image et le titre ouvrent la fiche produit.
+========================================================== */
+.ca-fproduct-card{
+  position:relative;
+  flex:0 0 clamp(215px,18.6vw,270px);
+  width:clamp(215px,18.6vw,270px);
+  min-width:0;
+  background:linear-gradient(180deg,#fffdf9 0%,#fff9f3 100%);
+  border:1px solid rgba(208,179,158,.72);
+  border-radius:28px;
+  box-shadow:
+    0 18px 44px rgba(74,47,34,.10),
+    0 5px 14px rgba(74,47,34,.045),
+    inset 0 1px 0 rgba(255,255,255,.96);
+  overflow:hidden;
+  scroll-snap-align:start;
+  isolation:isolate;
+  transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;
+}
+
+.ca-fproduct-card::after{
+  content:"";
+  position:absolute;
+  inset:5px;
+  z-index:4;
+  pointer-events:none;
+  border:1px solid rgba(226,207,193,.62);
+  border-radius:22px;
+}
+
+@media(hover:hover){
+  .ca-fproduct-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(190,143,121,.72);
+    box-shadow:
+      0 24px 54px rgba(74,47,34,.14),
+      0 8px 18px rgba(74,47,34,.055),
+      inset 0 1px 0 rgba(255,255,255,.98);
+  }
+}
+
+.ca-fproduct-card__media{
+  position:relative;
+  display:block;
+  aspect-ratio:.94;
+  margin:8px 8px 0;
+  overflow:hidden;
+  border-radius:21px 21px 17px 17px;
+  background:#f5ebe2;
+  text-decoration:none;
+}
+
+.ca-fproduct-card__media::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,250,246,.07) 0%,rgba(96,56,39,.04) 100%);
+}
+
+.ca-fproduct-card__media img,
+.ca-fproduct-card__media .placeholder-svg{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  transition:transform .55s cubic-bezier(.2,.65,.25,1);
+}
+
+@media(hover:hover){
+  .ca-fproduct-card:hover .ca-fproduct-card__media img{transform:scale(1.028)}
+}
+
+.ca-fproduct-card__media .placeholder-svg{
+  padding:30px;
+  color:#dcc9bb;
+  background:#f7eee6;
+}
+
+.ca-fproduct-card__love-note{
+  position:absolute;
+  z-index:3;
+  top:13px;
+  right:13px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:31px;
+  padding:0 13px;
+  border:1px solid rgba(207,155,136,.36);
+  border-radius:999px;
+  background:rgba(255,250,245,.92);
+  color:#a96557;
+  box-shadow:0 7px 18px rgba(82,52,38,.08);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+  font-family:var(--font-body--family,"Avenir Next",Arial,sans-serif);
+  font-size:9px;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:.105em;
+  text-transform:uppercase;
+}
+
+.ca-fproduct-card__love-heart{
+  font-family:Arial,sans-serif;
+  font-size:16px;
+  font-weight:400;
+  line-height:1;
+}
+
+
+.ca-fproduct-card__body{
+  position:relative;
+  z-index:2;
+  padding:17px 16px 18px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.ca-fproduct-card__kicker{
+  margin:0 0 9px;
+  color:#b28d7b;
+  font-family:var(--font-body--family,"Avenir Next",Arial,sans-serif);
+  font-size:10px;
+  font-weight:700;
+  line-height:1.15;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+
+.ca-fproduct-card__title{
+  margin:0;
+  min-height:46px;
+  color:#3b2923;
+  font-family:var(--font-heading--family,Georgia,"Times New Roman",serif);
+  font-size:19px;
+  font-weight:400;
+  line-height:1.22;
+}
+
+.ca-fproduct-card__title a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.ca-fproduct-card__personal-note{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin:6px 0 0;
+  color:#a7685b;
+  font-family:var(--font-body--family,"Avenir Next",Arial,sans-serif);
+  font-size:10px;
+  font-weight:600;
+  line-height:1.2;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+.ca-fproduct-card__personal-note span{
+  font-family:Arial,sans-serif;
+  font-size:15px;
+  line-height:1;
+}
+
+.ca-fproduct-card__divider{
+  width:78%;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:8px;
+  margin:11px 0 9px;
+  color:#d8b9a8;
+}
+
+.ca-fproduct-card__divider span{
+  height:1px;
+  background:currentColor;
+  opacity:.78;
+}
+
+.ca-fproduct-card__divider b{
+  color:#ca8b7d;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  font-weight:400;
+  line-height:1;
+}
+
+.ca-fproduct-card__price{
+  margin:0;
+  color:#3a2923;
+  font-family:var(--font-heading--family,Georgia,"Times New Roman",serif);
+  font-size:22px;
+  font-weight:600;
+  line-height:1;
+}
+
+.ca-fproduct-card__mini-benefits{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:5px 12px;
+  margin-top:13px;
+  padding-top:11px;
+  border-top:1px solid rgba(218,197,182,.58);
+  color:#8b6c5e;
+  font-family:var(--font-body--family,"Avenir Next",Arial,sans-serif);
+  font-size:8.5px;
+  font-weight:600;
+  line-height:1.1;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+/* Horizon native grids: the shared component fills its grid cell. */
+.product-grid__item > .ca-fproduct-card--native,
+results-list .ca-fproduct-card--native,
+.product-recommendations .ca-fproduct-card--native,
+.search-results .ca-fproduct-card--native{
+  width:100%;
+  max-width:none;
+  height:auto;
+  align-self:start;
+  flex:none;
+}
+
+.product-grid__item > .ca-fproduct-card--native .ca-fproduct-card__body{
+  min-height:0;
+  padding-bottom:12px;
+}
+
+@media(max-width:989px){
+  .ca-fproduct-card--native{border-radius:24px}
+  .ca-fproduct-card--native::after{border-radius:19px}
+  .ca-fproduct-card--native .ca-fproduct-card__love-note{top:11px;right:11px}
+}
+
+@media(max-width:599px){
+  .ca-fproduct-card--native{
+    border-radius:18px;
+  }
+
+  .ca-fproduct-card--native::after{
+    inset:3px;
+    border-radius:15px;
+  }
+
+  .ca-fproduct-card--native .ca-fproduct-card__media{
+    margin:5px 5px 0;
+    border-radius:14px 14px 11px 11px;
+  }
+
+  .ca-fproduct-card--native .ca-fproduct-card__love-note{
+    top:7px;
+    right:7px;
+    min-height:24px;
+    padding:0 8px;
+    gap:4px;
+    font-size:6.6px;
+    letter-spacing:.075em;
+  }
+
+  .ca-fproduct-card--native .ca-fproduct-card__love-heart{font-size:12px}
+
+  .ca-fproduct-card--native .ca-fproduct-card__body{
+    min-height:0;
+    padding:11px 8px 9px;
+  }
+
+  .ca-fproduct-card--native .ca-fproduct-card__kicker{
+    margin-bottom:6px;
+    font-size:7.2px;
+    letter-spacing:.1em;
+  }
+
+  .ca-fproduct-card--native .ca-fproduct-card__title{
+    min-height:32px;
+    font-size:14px;
+    line-height:1.16;
+  }
+
+  .ca-fproduct-card--native .ca-fproduct-card__personal-note{
+    gap:3px;
+    margin-top:5px;
+    font-size:6.8px;
+    letter-spacing:.025em;
+  }
+
+  .ca-fproduct-card--native .ca-fproduct-card__personal-note span{font-size:11px}
+
+  .ca-fproduct-card--native .ca-fproduct-card__divider{
+    width:84%;
+    gap:5px;
+    margin:8px 0 7px;
+  }
+
+  .ca-fproduct-card--native .ca-fproduct-card__price{font-size:16px}
+
+  .ca-fproduct-card--native .ca-fproduct-card__mini-benefits{
+    gap:4px 7px;
+    margin-top:7px;
+    padding-top:6px;
+    font-size:6px;
+    letter-spacing:.02em;
+  }
+}
+
+/* Collection mobile gutters — Horizon's actual native wrapper. */
+@media screen and (max-width:749px){
+  body.template-collection .main-collection-grid,
+  .template-collection .main-collection-grid,
+  collection-component .main-collection-grid{
+    padding-inline:18px !important;
+    box-sizing:border-box;
+  }
+
+  body.template-collection .main-collection-grid > div,
+  .template-collection .main-collection-grid > div,
+  collection-component .main-collection-grid > div{
+    min-width:0;
+    width:100%;
+  }
+
+  body.template-collection .product-grid,
+  .template-collection .product-grid,
+  collection-component .product-grid{
+    width:100%;
+    margin-inline:auto !important;
+  }
+}
+
+
+/* V3 — cartes collection plus compactes, sans vide inutile en bas. */
+.product-grid__item > .ca-fproduct-card--native .ca-fproduct-card__body,
+results-list .ca-fproduct-card--native .ca-fproduct-card__body,
+.product-recommendations .ca-fproduct-card--native .ca-fproduct-card__body,
+.search-results .ca-fproduct-card--native .ca-fproduct-card__body{
+  min-height:0 !important;
+  padding-bottom:12px;
+}
+
+.product-grid__item > .ca-fproduct-card--native .ca-fproduct-card__mini-benefits,
+results-list .ca-fproduct-card--native .ca-fproduct-card__mini-benefits,
+.product-recommendations .ca-fproduct-card--native .ca-fproduct-card__mini-benefits,
+.search-results .ca-fproduct-card--native .ca-fproduct-card__mini-benefits{
+  margin-bottom:0;
+}

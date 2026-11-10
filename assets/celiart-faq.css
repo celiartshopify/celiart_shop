@@ -1,0 +1,19 @@
+/* CeliArt FAQ — isolated component */
+.celiart-faq{--faq-ink:#3f302a;--faq-muted:#7a665c;--faq-line:#eadbd1;--faq-bg:#fffaf6;--faq-rose:#d6a09d;padding:clamp(44px,6vw,84px) 0;background:var(--faq-bg)}
+.celiart-faq__wrap{width:min(100% - 32px,980px);margin:0 auto}
+.celiart-faq__head{text-align:center;margin:0 auto 30px;max-width:720px}
+.celiart-faq__ornament{display:flex;align-items:center;justify-content:center;gap:12px;color:#c9a899;margin-bottom:12px}
+.celiart-faq__ornament:before,.celiart-faq__ornament:after{content:"";width:52px;height:1px;background:#dcc9be}
+.celiart-faq__ornament span{font-size:15px;color:var(--faq-rose)}
+.celiart-faq__title{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(38px,5vw,58px);font-weight:400;line-height:1;color:var(--faq-ink)}
+.celiart-faq__title em{font-family:"Allura","Snell Roundhand","Segoe Script",cursive;font-size:1.12em;font-style:normal;font-weight:400;color:#8a665b}
+.celiart-faq__subtitle{margin:14px auto 0;color:var(--faq-muted);font-family:Georgia,"Times New Roman",serif;font-size:15px;line-height:1.5}
+.celiart-faq__list{display:grid;gap:12px}
+.celiart-faq__item{border:1px solid var(--faq-line);border-radius:17px;background:#fff;box-shadow:0 8px 24px rgba(74,48,36,.045);overflow:hidden}
+.celiart-faq__question{list-style:none;display:grid;grid-template-columns:minmax(0,1fr) 34px;align-items:center;gap:16px;min-height:68px;padding:17px 20px;cursor:pointer;font-family:Georgia,"Times New Roman",serif;font-size:17px;color:var(--faq-ink)}
+.celiart-faq__question::-webkit-details-marker{display:none}
+.celiart-faq__plus{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#fbefea;color:#9a6f64;font-family:Arial,sans-serif;font-size:20px;line-height:1;transition:transform .2s ease}
+.celiart-faq__item[open] .celiart-faq__plus{transform:rotate(45deg)}
+.celiart-faq__answer{padding:0 20px 20px;color:var(--faq-muted);font-size:14px;line-height:1.65}
+.celiart-faq__answer p{margin:0}
+@media(max-width:749px){.celiart-faq{padding:40px 0}.celiart-faq__wrap{width:calc(100% - 28px)}.celiart-faq__head{margin-bottom:22px}.celiart-faq__title{font-size:40px}.celiart-faq__question{min-height:62px;padding:15px 16px;font-size:15px}.celiart-faq__answer{padding:0 16px 17px;font-size:13px}}
